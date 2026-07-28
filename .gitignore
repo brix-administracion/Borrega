@@ -29,6 +29,28 @@ public_html/wp-content/backup*/
 public_html/wp-content/backups/
 public_html/wp-content/wp-fastest-cache-premium/
 public_html/wp-content/uploads/unlimited_elements_cache/
+public_html/wp-content/ai1wm-backups/
+public_html/wp-content/maintenance/
+public_html/wp-content/maintenance.php
+public_html/wp-content/ewww/
+
+# === WordPress: plugins/temas no usados por el front headless (Astro) ===
+public_html/wp-content/plugins/elementor/
+public_html/wp-content/plugins/elementor-pro/
+public_html/wp-content/plugins/happy-elementor-addons/
+public_html/wp-content/plugins/ooohboi-steroids-for-elementor/
+public_html/wp-content/themes/hello-elementor/
+public_html/wp-content/plugins/wp-fastest-cache/
+public_html/wp-content/plugins/cookie-law-info/
+public_html/wp-content/plugins/honeypot/
+public_html/wp-content/plugins/mailchimp-forms-by-mailmunch/
+public_html/wp-content/plugins/safe-svg/
+public_html/wp-content/plugins/wp-scheduler/
+public_html/wp-content/plugins/all-in-one-wp-migration/
+public_html/wp-content/plugins/creame-whatsapp-me/
+public_html/wp-content/plugins/__MACOSX/
+public_html/wp-content/plugins/borrega-kickoff-form/
+public_html/wp-content/plugins/google-site-kit/
 
 # === Logs ===
 error_log
