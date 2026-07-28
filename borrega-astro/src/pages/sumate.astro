@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GradientHero from '../components/GradientHero.astro';
+---
+
+<BaseLayout title="Sumate — Börrega Studio" description="Siempre es un buen momento para agrandar el rebaño. Sumate al equipo de Börrega.">
+  <GradientHero>
+    Siempre es un buen momento para agrandar el rebaño
+    <Fragment slot="subtitle">No te olvides de adjuntar tu carpeta y contarnos porqué querés ser parte de Börrega.</Fragment>
+  </GradientHero>
+
+  <section class="sumate-form-section">
+    <div class="container">
+      <form id="sumate-form" class="web-form" enctype="multipart/form-data">
+        <input type="hidden" name="subject" value="Nueva postulación — Sumate" />
+        <input type="text" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="form-field">
+          <label for="name">Nombre completo *</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-field">
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" name="telefono" />
+        </div>
+
+        <div class="form-field">
+          <label for="cargo">Cargo / a qué te dedicás</label>
+          <input type="text" id="cargo" name="cargo" />
+        </div>
+
+        <div class="form-field">
+          <label for="portfolio-link">Link a tu portfolio</label>
+          <input type="url" id="portfolio-link" name="portfolio_link" placeholder="https://" />
+        </div>
+
+        <div class="form-field">
+          <label for="portfolio-file">Adjuntar carpeta / CV</label>
+          <input type="file" id="portfolio-file" name="attachment" accept=".pdf,.doc,.docx,.zip,image/*" />
+        </div>
+
+        <div class="form-field">
+          <label for="message">Contanos por qué querés ser parte de Börrega *</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+
+        <button type="submit" class="btn form-submit-btn" data-form-submit>Enviar</button>
+        <p class="form-status" data-form-status></p>
+      </form>
+
+      <p class="alt-contact">¿Preferís otra vía? Escribinos directo a <a href="mailto:info@borregastudio.com">info@borregastudio.com</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initWeb3Form } from '../scripts/web3form';
+  initWeb3Form('sumate-form');
+</script>
+
+<style>
+  .sumate-form-section {
+    background: var(--color-white);
+    padding-block: var(--space-5);
+  }
+  .web-form {
+    max-width: 620px;
+    margin-inline: auto;
+  }
+  .hp-field {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .alt-contact {
+    text-align: center;
+    margin-top: var(--space-3);
+    color: rgba(27, 27, 27, 0.6);
+    max-width: 620px;
+    margin-inline: auto;
+  }
+  .alt-contact a { color: var(--color-secondary); font-weight: 600; }
+</style>

@@ -1,0 +1,37 @@
+# Translation of Plugins - WP Armour &#8211; Honeypot Anti Spam - Stable (latest release) in Spanish (Spain)
+# This file is distributed under the same license as the Plugins - WP Armour &#8211; Honeypot Anti Spam - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2025-03-05 07:07:52+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: es\n"
+"Project-Id-Version: Plugins - WP Armour &#8211; Honeypot Anti Spam - Stable (latest release)\n"
+
+#. Author URI of the plugin
+#: wp-armour.php
+msgid "https://dineshkarki.com.np/wp-armour-anti-spam"
+msgstr "https://dineshkarki.com.np/wp-armour-anti-spam"
+
+#. Author of the plugin
+#: wp-armour.php
+msgid "Dnesscarkey"
+msgstr "Dnesscarkey"
+
+#. Description of the plugin
+#: wp-armour.php
+msgid "Add honeypot anti spam protection."
+msgstr "Añade la protección «Honeypot Anti Spam»."
+
+#. Plugin URI of the plugin
+#: wp-armour.php
+msgid "http://wordpress.org/plugins/honeypot/"
+msgstr "http://wordpress.org/plugins/honeypot/"
+
+#. Plugin Name of the plugin
+#: wp-armour.php
+msgid "WP Armour - Honeypot Anti Spam"
+msgstr "WP Armour - Honeypot Anti Spam"

@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<section class="portfolio-hero">
+  <div class="container">
+    <h1 data-reveal>{title}</h1>
+  </div>
+</section>
+
+<style>
+  .portfolio-hero {
+    background: linear-gradient(180deg, rgba(10, 10, 12, 0.75), rgba(0, 0, 0, 0.92)), var(--color-primary);
+    color: var(--color-white);
+    padding-block: var(--space-5) var(--space-4);
+    text-align: center;
+  }
+  .portfolio-hero h1 {
+    display: inline-block;
+    padding-bottom: var(--space-1);
+    border-bottom: 3px solid var(--color-white);
+    font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  }
+</style>

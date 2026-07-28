@@ -1,0 +1,22 @@
+---
+interface Props {
+  eyebrowHtml: string;
+  conclusionHtml?: string;
+}
+const { eyebrowHtml, conclusionHtml } = Astro.props;
+---
+
+<section class="intro">
+  <div class="container">
+    <p class="lead" data-reveal set:html={eyebrowHtml} />
+    {conclusionHtml && <p class="conclusion" data-reveal set:html={conclusionHtml} />}
+  </div>
+</section>
+
+<style>
+  .intro { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5) var(--space-3); text-align: center; }
+  .lead { max-width: 62ch; margin-inline: auto; font-size: 1.1rem; opacity: 0.9; }
+  .conclusion { font-family: var(--font-display); font-size: 1.6rem; margin-top: var(--space-3); }
+  .intro :global(.hl) { color: var(--color-pink); }
+  .intro :global(.hl-purple) { color: var(--color-secondary); }
+</style>

@@ -1,0 +1,42 @@
+---
+interface Props {
+  label?: string;
+  price: string;
+  items: string[];
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+const { label = 'Valor del servicio', price, items, ctaLabel = 'SOLICITAR AUDITORÍA', ctaHref = '/reservar-consulta' } = Astro.props;
+---
+
+<section class="pricing">
+  <div class="container">
+    <div class="pricing-card" data-reveal>
+      <p class="label">{label}</p>
+      <p class="price">{price}</p>
+      <ul>
+        {items.map((item) => <li>{item}</li>)}
+      </ul>
+      <a href={ctaHref} class="btn btn-accent">{ctaLabel}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-4); }
+  .pricing-card {
+    background: #16161a;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    text-align: center;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .label { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; opacity: 0.7; }
+  .price { font-family: var(--font-display); font-size: 2.4rem; color: var(--color-accent); margin: 0.2rem 0 var(--space-2); }
+  .pricing-card ul { list-style: none; margin: 0 0 var(--space-3); padding: 0; display: grid; gap: 0.5rem; }
+  .pricing-card li { font-size: 0.9rem; opacity: 0.85; }
+  .btn-accent { background: var(--color-accent); color: var(--color-primary); border-color: var(--color-accent); }
+  .btn-accent:hover { background: transparent; color: var(--color-white); border-color: var(--color-white); }
+</style>

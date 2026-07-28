@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceHero from '../components/service/ServiceHero.astro';
+import FeatureColumns from '../components/service/FeatureColumns.astro';
+import PricingCard from '../components/service/PricingCard.astro';
+import Checklist from '../components/service/Checklist.astro';
+import FAQAccordion from '../components/service/FAQAccordion.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+---
+
+<BaseLayout title="Börrega Audit RRSS — Auditoría de Redes Sociales" description="Analizá tu presencia en redes sociales antes de seguir publicando sin rumbo.">
+  <ServiceHero
+    title="Auditoría Profesional de Redes Sociales."
+    subtitle="Analizá tu presencia en redes sociales antes de seguir publicando sin rumbo."
+    variant="glow"
+    decorIcons
+    primaryCta={{ label: 'AGENDAR REUNIÓN', href: '/reservar-consulta' }}
+  />
+
+  <FeatureColumns
+    columns={[
+      {
+        heading: 'Publicar sin estrategia clara',
+        items: [
+          'Desgaste constante sin ver resultados',
+          'Baja interacción en tus publicaciones',
+          'Sensación de hacer todo pero sin impacto',
+        ],
+      },
+      {
+        heading: 'Diagnóstico estratégico',
+        intro: 'La Auditoría de Redes Sociales es un servicio de diagnóstico estratégico que analiza el estado actual de tu marca en plataformas sociales. Evaluamos contenido, identidad visual, mensaje y coherencia para detectar oportunidades de mejora concretas y accionables.',
+        items: ['Análisis profesional', 'Identidad visual', 'Oportunidades concretas', 'Recomendaciones accionables'],
+      },
+      {
+        heading: 'Qué incluye',
+        items: [
+          'Análisis del perfil y biografía',
+          'Evaluación de contenidos publicados',
+          'Tono, narrativa y mensaje',
+          'Uso de formatos (reels, carruseles, historias)',
+          'Coherencia visual',
+          'Lectura general de engagement',
+          'Buenas prácticas del sector',
+        ],
+      },
+      {
+        heading: 'Entregable',
+        items: [
+          'Documento de diagnóstico',
+          'Reporte completo y profesional',
+          'Hallazgos clave',
+          'Puntos críticos identificados',
+          'Recomendaciones estratégicas',
+          'Acciones claras y aplicables',
+        ],
+      },
+    ]}
+  />
+
+  <PricingCard
+    price="USD 350"
+    items={['Análisis completo de tu presencia', 'Recomendaciones accionables', 'Documento de diagnóstico detallado', 'Entrega en pocos días']}
+    ctaLabel="SOLICITAR AUDITORÍA"
+  />
+
+  <Checklist
+    heading="Es para vos si…"
+    tone="plain"
+    items={[
+      'Sentís que tus redes no están funcionando',
+      'Querés mejorar sin improvisar',
+      'Necesitás claridad antes de invertir más tiempo o dinero',
+    ]}
+  />
+
+  <FAQAccordion
+    items={[
+      { question: '¿Qué es una auditoría de redes sociales?', answer: 'Es un análisis profesional de la presencia de una marca en redes sociales para detectar errores, oportunidades y mejoras estratégicas.' },
+      { question: '¿Qué redes sociales analizan?', answer: 'Principalmente Instagram, aunque el análisis puede adaptarse a otras plataformas según el caso.' },
+      { question: '¿La auditoría incluye métricas o solo contenido?', answer: 'Incluye lectura general de engagement, coherencia visual, mensaje y uso de formatos, con foco estratégico.' },
+      { question: '¿Recibo recomendaciones concretas?', answer: 'Sí. El entregable incluye acciones claras y aplicables.' },
+      { question: '¿Cuál es el valor de la auditoría?', answer: 'El valor del servicio es de USD 350.' },
+    ]}
+  />
+
+  <ServiceFinalCTA
+    titleHtml="Solicitar tu <span class='hl'>auditoría de redes sociales</span>"
+    text="Agendá una reunión y recibí tu diagnóstico."
+    ctaLabel="SOLICITAR AUDITORÍA"
+  />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+</style>

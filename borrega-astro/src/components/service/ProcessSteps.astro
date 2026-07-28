@@ -1,0 +1,48 @@
+---
+interface Step { title: string; text: string }
+interface Props { heading?: string; steps: Step[] }
+const { heading, steps } = Astro.props;
+---
+
+<section class="process">
+  <div class="container">
+    {heading && <h2 data-reveal>{heading}</h2>}
+    <ol data-reveal>
+      {steps.map((s, i) => (
+        <li>
+          <span class="num">{String(i + 1).padStart(2, '0')}</span>
+          <div>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5); }
+  .process h2 { text-align: center; margin-bottom: var(--space-4); font-size: 1.6rem; }
+  .process ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+    counter-reset: step;
+  }
+  .process li { display: flex; gap: var(--space-2); align-items: flex-start; }
+  .num {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+  .process h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .process p { color: rgba(255,255,255,0.75); font-size: 0.92rem; margin: 0; }
+
+  @media (min-width: 900px) {
+    .process ol { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>

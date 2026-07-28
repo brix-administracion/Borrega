@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceHero from '../components/service/ServiceHero.astro';
+import IntroStatement from '../components/service/IntroStatement.astro';
+import FeatureColumns from '../components/service/FeatureColumns.astro';
+import ProcessSteps from '../components/service/ProcessSteps.astro';
+import Checklist from '../components/service/Checklist.astro';
+import FAQAccordion from '../components/service/FAQAccordion.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+---
+
+<BaseLayout title="Börrega Core — Servicios Multidisciplinarios" description="Un equipo creativo y estratégico que acompaña a tu marca con foco en claridad, coherencia y resultados.">
+  <ServiceHero
+    title="Servicios multidisciplinarios de <span class='hl-purple'>comunicación, branding</span> y estrategia."
+    subtitle="Un equipo creativo y estratégico que acompaña a tu marca con foco en claridad, coherencia y resultados."
+    variant="glow"
+    decorIcons
+    primaryCta={{ label: 'AGENDAR REUNIÓN', href: '/reservar-consulta' }}
+    secondaryCta={{ label: 'VER SERVICIOS', href: '/#servicios' }}
+  />
+
+  <IntroStatement
+    eyebrowHtml="Muchas marcas crecen sin una <span class='hl-purple'>estrategia clara</span> de comunicación. Contratan servicios aislados, producen contenido sin dirección y terminan tomando decisiones reactivas que no construyen valor a largo plazo. Cuando la comunicación se fragmenta, la marca pierde fuerza, coherencia y eficiencia."
+    conclusionHtml="Börrega Core es nuestro <span class='hl'>servicio de comunicación integral.</span>"
+  />
+
+  <FeatureColumns
+    columns={[
+      {
+        heading: 'Qué incluye',
+        items: [
+          'Estrategia de marca y comunicación',
+          'Branding e identidad visual',
+          'Diseño gráfico y digital',
+          'Contenidos para redes sociales',
+          'Campañas creativas y publicitarias',
+          'Dirección creativa',
+        ],
+      },
+    ]}
+  />
+
+  <ProcessSteps
+    heading="Cómo trabajamos"
+    steps={[
+      { title: 'Entendimiento', text: 'Profundizamos en el negocio, los objetivos y el contexto de tu marca.' },
+      { title: 'Definición estratégica', text: 'Establecemos el norte comunicacional y las líneas de acción.' },
+      { title: 'Desarrollo creativo', text: 'Diseñamos las soluciones visuales y de contenido.' },
+      { title: 'Implementación', text: 'Ejecutamos, medimos y ajustamos para maximizar resultados.' },
+    ]}
+  />
+
+  <FeatureColumns
+    columns={[
+      {
+        heading: 'Es para vos si…',
+        items: [
+          'Necesitás un partner estratégico, no solo ejecución',
+          'Buscás coherencia y visión a largo plazo',
+          'Querés resolver comunicación y diseño desde un mismo equipo',
+        ],
+      },
+      {
+        heading: 'No es para vos si…',
+        items: [
+          'Buscás soluciones aisladas sin estrategia',
+          'Necesitás solo una pieza puntual sin contexto',
+        ],
+      },
+    ]}
+  />
+
+  <FAQAccordion
+    items={[
+      { question: '¿Qué son los servicios multidisciplinarios de comunicación?', answer: 'Son servicios integrales que combinan estrategia, branding, diseño, contenido y ejecución desde un mismo equipo, evitando la fragmentación de proveedores.' },
+      { question: '¿Trabajan por fee mensual o por proyecto?', answer: 'Ambas modalidades. El fee mensual es ideal para acompañamiento continuo; el formato proyecto se adapta a objetivos puntuales con inicio y cierre definidos.' },
+      { question: '¿Qué tipo de empresas trabajan con Börrega Studio?', answer: 'Trabajamos con marcas y empresas que buscan un partner estratégico y creativo, no solo ejecución aislada.' },
+      { question: '¿Incluye implementación o solo estrategia?', answer: 'Incluye ambas. Pensamos la estrategia y la llevamos a la acción.' },
+      { question: '¿Puedo escalar el servicio con el tiempo?', answer: 'Sí. Los servicios se ajustan según la etapa y necesidades del negocio.' },
+    ]}
+  />
+
+  <ServiceFinalCTA titleHtml="Hablemos de <span class='hl'>tu proyecto</span>" text="Agendá una reunión y definimos la mejor modalidad." />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+  :global(.hl-purple) { color: var(--color-secondary); }
+</style>

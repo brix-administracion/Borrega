@@ -1,0 +1,61 @@
+---
+import { Image } from 'astro:assets';
+import aboutPhoto from '../assets/images/about-photo.png';
+---
+<section id="nosotros" class="about">
+  <div class="container about-grid">
+    <div class="about-copy" data-reveal>
+      <p>
+        Somos Börrega. Un estudio de diseño, estrategia, creatividad e implementación que
+        transforma necesidades en soluciones. No seguimos al rebaño: pensamos distinto,
+        actuamos con precisión y nos gusta hacerlo bien.
+      </p>
+      <p>
+        Nuestro equipo multidisciplinario es liderado por Pilar Puig Lómez, Founder y Directora
+        Creativa, cuya visión estratégica y experiencia internacional son parte esencial de cada
+        proyecto.
+      </p>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="btn btn-dark">VER LINKEDIN</a>
+    </div>
+    <div class="about-media" data-reveal>
+      <img src="/images/deco/meeh.png" alt="" class="pill-meeh" width="140" height="46" />
+      <Image src={aboutPhoto} alt="Equipo Börrega" width={640} height={428} loading="lazy" />
+      <img src="/images/deco/cursor.png" alt="" class="deco-cursor" width="28" height="46" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .about { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-6); }
+  .about-grid { display: grid; gap: var(--space-4); align-items: center; }
+  .about-copy p { opacity: 0.85; max-width: 52ch; }
+  .btn-dark { border-color: var(--color-white); }
+  .about-media { position: relative; }
+  .about-media :global(img):not(.pill-meeh):not(.deco-cursor) {
+    border-radius: var(--radius-md);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 640 / 428;
+    object-fit: cover;
+    background: #2a2a2a;
+  }
+  .pill-meeh {
+    position: absolute;
+    top: -18px;
+    left: var(--space-3);
+    z-index: 1;
+    width: 120px;
+    height: auto;
+  }
+  .deco-cursor {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 26px;
+    height: auto;
+  }
+
+  @media (min-width: 900px) {
+    .about-grid { grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  }
+</style>

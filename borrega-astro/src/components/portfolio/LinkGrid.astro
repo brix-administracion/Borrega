@@ -1,0 +1,108 @@
+---
+interface LinkItem {
+  text: string;
+  href?: string;
+}
+interface Column {
+  heading: string;
+  items: LinkItem[];
+  note?: string;
+  noteItems?: string[];
+}
+interface Props {
+  columns: Column[];
+}
+const { columns } = Astro.props;
+---
+
+<section class="link-grid-section">
+  <div class="container">
+    <div class="link-grid" data-reveal>
+      {
+        columns.map((col) => (
+          <div class="link-col">
+            <h2>{col.heading}</h2>
+            <ul>
+              {col.items.map((item) =>
+                item.href ? (
+                  <li>
+                    <a href={item.href} target="_blank" rel="noopener">
+                      🔗 {item.text}
+                    </a>
+                  </li>
+                ) : (
+                  <li class="plain">{item.text}</li>
+                )
+              )}
+            </ul>
+            {col.note && col.noteItems && (
+              <div class="note">
+                <p class="note-label">{col.note}</p>
+                <ul>
+                  {col.noteItems.map((n) => (
+                    <li class="plain">{n}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .link-grid-section {
+    background: var(--color-white);
+    padding-block: var(--space-4);
+  }
+  .link-grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+  @media (min-width: 700px) {
+    .link-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+  .link-col {
+    background: #f7f7f8;
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+  }
+  .link-col h2 {
+    font-size: 1.3rem;
+    margin-bottom: var(--space-2);
+  }
+  .link-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .link-col a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .link-col a:hover {
+    color: var(--color-secondary);
+  }
+  .link-col li.plain {
+    color: rgba(27, 27, 27, 0.6);
+  }
+  .note {
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid rgba(27, 27, 27, 0.1);
+  }
+  .note-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(27, 27, 27, 0.5);
+    margin-bottom: 0.5rem;
+  }
+</style>

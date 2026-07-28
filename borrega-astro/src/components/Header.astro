@@ -1,0 +1,140 @@
+---
+const navItems = [
+  { label: 'SERVICIOS', href: '/#servicios' },
+  { label: 'NOSOTROS', href: '/#nosotros' },
+  { label: 'NUESTRO TRABAJO', href: '/#trabajo' },
+];
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo" aria-label="Börrega Studio - inicio">
+      börrega
+    </a>
+    <div class="socials">
+      <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/" aria-label="LinkedIn" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.24 8.5h4.5V23h-4.5V8.5zM8.5 8.5h4.32v1.98h.06c.6-1.13 2.07-2.32 4.26-2.32 4.56 0 5.4 3 5.4 6.9V23h-4.5v-6.5c0-1.55-.03-3.55-2.17-3.55-2.17 0-2.5 1.7-2.5 3.44V23h-4.5V8.5z"/></svg>
+      </a>
+    </div>
+    <nav class="main-nav" id="main-nav">
+      <ul>
+        {navItems.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+        <li class="nav-cta-mobile"><a href="/contacto" class="btn">CONSULTORÍA GRATIS</a></li>
+      </ul>
+    </nav>
+    <a href="/contacto" class="btn header-cta">CONSULTORÍA GRATIS</a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--color-bg);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--color-white);
+    border-right: 1px solid rgba(255,255,255,0.3);
+    padding-right: var(--space-2);
+    white-space: nowrap;
+  }
+  .socials {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .socials a { color: var(--color-white); display: flex; }
+
+  .menu-toggle {
+    margin-left: auto;
+    background: none;
+    border: none;
+    width: 32px;
+    height: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 0;
+  }
+  .menu-toggle span {
+    display: block;
+    height: 2px;
+    background: var(--color-white);
+    border-radius: 2px;
+  }
+
+  .main-nav {
+    position: fixed;
+    inset: 0 0 0 auto;
+    top: 0;
+    height: 100vh;
+    width: min(80vw, 320px);
+    background: var(--color-bg);
+    transform: translateX(100%);
+    transition: transform 0.35s var(--ease-out);
+    padding: 5.5rem var(--space-3) var(--space-3);
+    z-index: 40;
+  }
+  .main-nav.is-open { transform: translateX(0); }
+  .main-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .main-nav a {
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .nav-cta-mobile { margin-top: var(--space-2); }
+  .header-cta { display: none; font-size: 0.8rem; padding: 0.7rem 1.25rem; }
+
+  @media (min-width: 900px) {
+    .menu-toggle { display: none; }
+    .header-cta { display: inline-flex; margin-left: auto; }
+    .main-nav {
+      position: static;
+      height: auto;
+      width: auto;
+      background: transparent;
+      transform: none;
+      padding: 0;
+      margin-left: var(--space-2);
+    }
+    .main-nav ul { flex-direction: row; gap: var(--space-4); align-items: center; }
+    .main-nav a { font-size: 0.85rem; }
+    .nav-cta-mobile { display: none; }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('main-nav');
+  toggle?.addEventListener('click', () => {
+    const isOpen = nav?.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(!!isOpen));
+  });
+</script>

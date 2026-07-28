@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceHero from '../components/service/ServiceHero.astro';
+import sheepAudit from '../assets/images/service/sheep-audit.png';
+import IntroStatement from '../components/service/IntroStatement.astro';
+import Checklist from '../components/service/Checklist.astro';
+import FeatureColumns from '../components/service/FeatureColumns.astro';
+import FAQAccordion from '../components/service/FAQAccordion.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+---
+
+<BaseLayout title="Börrega Audit — Auditoría de Comunicación" description="Ordenar la comunicación es el primer paso para crecer.">
+  <ServiceHero
+    title="Börrega Audit"
+    subtitle="Ordenar la comunicación es el primer paso para crecer."
+    variant="photo"
+    image={sheepAudit}
+    primaryCta={{ label: 'AGENDAR REUNIÓN', href: '/reservar-consulta' }}
+    secondaryCta={{ label: 'VER SERVICIOS', href: '/#servicios' }}
+  />
+
+  <IntroStatement
+    eyebrowHtml="Cuando una marca comunica <span class='hl-purple'>sin estrategia integral</span> aparecen los mensajes confusos, identidades inconsistentes y esfuerzos que no construyen posicionamiento. En fin, se trabaja <span class='hl'>sin rumbo y sin resultados.</span>"
+    conclusionHtml="Börrega Audit es <span class='hl'>lo que su empresa necesita.</span>"
+  />
+
+  <Checklist
+    heading="Nuestro servicio de auditoría es para tu empresa si:"
+    items={[
+      'Sentís que tu marca perdió claridad',
+      'Querés reordenar la comunicación para una nueva etapa',
+      'Necesitás una mirada estratégica externa',
+      'Crecieron rápido o nunca ordenaron su comunicación de forma estratégica',
+    ]}
+  />
+
+  <FeatureColumns
+    columns={[
+      {
+        heading: 'Cómo trabajamos',
+        intro: 'La Auditoría de Comunicación Integral analiza la comunicación de tu marca como un sistema completo.',
+        items: [
+          'Evaluamos cómo se expresa, qué mensaje transmite y si existe coherencia entre identidad, canales y posicionamiento.',
+          'El objetivo es detectar inconsistencias y oportunidades para construir una comunicación más sólida y efectiva.',
+          'En el caso de Auditoría de Redes Sociales (RRSS) la investigación se limita a las redes de la marca.',
+        ],
+      },
+      {
+        heading: 'Qué analizamos',
+        items: [
+          'Posicionamiento y propuesta de valor',
+          'Identidad y coherencia de marca',
+          'Mensaje central y narrativa',
+          'Coherencia entre canales (web, redes, piezas, campañas)',
+          'Oportunidades estratégicas',
+          'Comunicación visual y verbal',
+        ],
+      },
+      {
+        heading: 'Qué les entregamos',
+        items: [
+          'Diagnóstico integral — Análisis completo del estado actual de tu comunicación de marca',
+          'Mapa de inconsistencias — Visualización clara de los puntos de mejora detectados',
+          'Lineamientos estratégicos de mejora — Guía con acciones concretas para fortalecer tu comunicación',
+        ],
+      },
+    ]}
+  />
+
+  <FAQAccordion
+    items={[
+      { question: '¿Qué es una auditoría de comunicación?', answer: 'Es un diagnóstico integral que analiza la comunicación de una marca como sistema: mensaje, identidad, coherencia y posicionamiento.' },
+      { question: '¿En qué se diferencia la auditoría integral de la auditoría de redes sociales?', answer: 'La auditoría de comunicación es más amplia: analiza todos los canales y la estrategia global de marca, no solo redes.' },
+      { question: '¿La auditoría integral incluye branding y posicionamiento?', answer: 'Sí. Se evalúa la propuesta de valor, narrativa y coherencia de marca.' },
+      { question: '¿Para qué tipo de marcas es recomendable?', answer: 'Para cualquier tipo de marca, desde startups hasta grandes corporaciones, especialmente las que buscan crecimiento sostenido y mayor competitividad.' },
+    ]}
+  />
+
+  <ServiceFinalCTA
+    titleHtml="Solicitar <span class='hl'>auditoría</span>"
+    text="Tomá decisiones con información clara. Solicitá una propuesta personalizada para comunicación integral o sólo para Redes Sociales."
+  />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+  :global(.hl-purple) { color: var(--color-secondary); }
+</style>

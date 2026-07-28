@@ -1,0 +1,38 @@
+---
+interface Props {
+  eyebrow?: string;
+}
+const { eyebrow } = Astro.props;
+---
+<section class="gradient-hero">
+  <div class="container">
+    {eyebrow && <p class="eyebrow" data-reveal>{eyebrow}</p>}
+    <h1 data-reveal><slot /></h1>
+    <p class="subtitle"><slot name="subtitle" /></p>
+  </div>
+</section>
+
+<style>
+  .gradient-hero {
+    background: linear-gradient(var(--color-secondary) 0%, var(--color-primary) 100%);
+    color: var(--color-white);
+    padding-block: var(--space-5) var(--space-4);
+    text-align: center;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+  .gradient-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    max-width: 30ch;
+    margin-inline: auto;
+  }
+  .subtitle {
+    opacity: 0.85;
+    max-width: 40ch;
+    margin: var(--space-1) auto 0;
+  }
+</style>

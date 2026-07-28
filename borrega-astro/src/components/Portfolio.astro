@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import socialMediaPhone from '../assets/images/portfolio/social-media-phone.jpg';
+import psCampana from '../assets/images/portfolio/ps-campana.jpg';
+import web1 from '../assets/images/portfolio/web-1.png';
+import web2 from '../assets/images/portfolio/web-2.png';
+import web3 from '../assets/images/portfolio/web-3.png';
+import stopicLogo from '../assets/images/portfolio/stopic-logo.png';
+import sofiaTarjetas from '../assets/images/portfolio/sofia-tarjetas.jpg';
+import branding6 from '../assets/images/portfolio/branding-6.png';
+
+const items = [
+  { img: web1, alt: 'Branding editorial' },
+  { img: psCampana, alt: 'Fotografía de producto' },
+  { img: web2, alt: 'Diseño web' },
+  { img: socialMediaPhone, alt: 'Contenido para redes sociales' },
+  { img: web3, alt: 'Producto digital' },
+  { img: stopicLogo, alt: 'Logotipo Stopic' },
+  { img: branding6, alt: 'Sistema de branding' },
+  { img: sofiaTarjetas, alt: 'Papelería Sofía Clerici' },
+];
+---
+
+<section id="trabajo" class="portfolio">
+  <div class="container">
+    <h2 class="portfolio-title" data-reveal>Nuestro trabajo</h2>
+    <ul class="portfolio-grid" data-reveal>
+      {items.map((item) => (
+        <li class="portfolio-item">
+          <Image src={item.img} alt={item.alt} width={520} height={520} loading="lazy" />
+        </li>
+      ))}
+    </ul>
+    <a href="/nuestro-trabajo" class="portfolio-more">VER MÁS</a>
+  </div>
+</section>
+
+<style>
+  .portfolio { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-6); }
+  .portfolio-title { text-align: center; margin-bottom: var(--space-4); }
+  .portfolio-grid {
+    list-style: none;
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+  .portfolio-item {
+    overflow: hidden;
+    border-radius: 12px;
+    aspect-ratio: 1 / 1;
+  }
+  .portfolio-item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .portfolio-item:hover :global(img) { transform: scale(1.06); }
+  .portfolio-more {
+    display: block;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: var(--space-3);
+  }
+
+  @media (min-width: 700px) {
+    .portfolio-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>

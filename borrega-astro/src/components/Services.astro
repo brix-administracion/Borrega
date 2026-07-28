@@ -1,0 +1,61 @@
+---
+const services = [
+  { label: 'Publicidad', color: 'default' },
+  { label: 'Diseño gráfico', color: 'accent' },
+  { label: 'Desarrollo web', color: 'default' },
+  { label: 'Branding', color: 'teal' },
+  { label: 'Producción gráfica', color: 'default' },
+  { label: 'Redes Sociales', color: 'default' },
+  { label: 'Packaging', color: 'default' },
+  { label: 'Animación', color: 'default' },
+  { label: 'Estrategia', color: 'green' },
+  { label: 'Mailing', color: 'default' },
+  { label: '3D', color: 'default' },
+  { label: 'Creatividad', color: 'pink' },
+  { label: 'Editorial', color: 'default' },
+  { label: 'Marketing Digital', color: 'orange' },
+];
+---
+
+<section id="servicios" class="services">
+  <div class="container">
+    <p class="services-intro" data-reveal>
+      Trabajamos con un enfoque multidisciplinario que combina estrategia, creatividad e
+      implementación desde un mismo equipo. Acompañamos marcas bajo modalidad fee mensual o
+      por proyecto, adaptándonos a cada etapa del negocio. Pensamos, diseñamos y ejecutamos
+      soluciones que funcionan en el mundo real.
+    </p>
+    <ul class="services-cloud" data-reveal>
+      {services.map((s) => (
+        <li class:list={['tag', `tag-${s.color}`]}>{s.label}</li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5); }
+  .services-intro { max-width: 62ch; margin: 0 auto var(--space-4); text-align: center; opacity: 0.85; }
+  .services-cloud {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    justify-content: center;
+  }
+  .tag {
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--color-white);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .tag-default { background: transparent; }
+  .tag-accent { background: var(--color-accent); color: var(--color-primary); border-color: var(--color-accent); }
+  .tag-teal { background: var(--color-teal); color: var(--color-primary); border-color: var(--color-teal); }
+  .tag-green { background: var(--color-green); color: var(--color-white); border-color: var(--color-green); }
+  .tag-pink { background: var(--color-pink); color: var(--color-primary); border-color: var(--color-pink); }
+  .tag-orange { background: var(--color-orange); color: var(--color-white); border-color: var(--color-orange); }
+</style>

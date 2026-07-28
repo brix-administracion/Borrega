@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GradientHero from '../components/GradientHero.astro';
+---
+
+<BaseLayout title="Reservar Consulta — Börrega Studio" description="Coordinemos una consultoría gratuita para tu proyecto.">
+  <GradientHero>
+    Reservar Consulta
+    <Fragment slot="subtitle">Contanos un poco sobre tu proyecto y coordinamos un horario que te quede cómodo. Sin costo, sin compromiso.</Fragment>
+  </GradientHero>
+
+  <section class="contact-options">
+    <div class="container contact-grid">
+      <a class="contact-card" href="https://wa.me/5491171327309" target="_blank" rel="noopener">
+        <span class="contact-icon" aria-hidden="true">💬</span>
+        <h2>WhatsApp</h2>
+        <p>+54 9 11 7132-7309 — la vía más rápida para coordinar el horario.</p>
+      </a>
+      <a class="contact-card" href="mailto:info@borregastudio.com?subject=Quiero%20reservar%20una%20consultor%C3%ADa">
+        <span class="contact-icon" aria-hidden="true">✉</span>
+        <h2>Escribinos</h2>
+        <p>info@borregastudio.com — contanos día y horario tentativos.</p>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-options {
+    background: var(--color-bg);
+    color: var(--color-white);
+    padding-block: var(--space-5);
+  }
+  .contact-grid {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .contact-card {
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    text-align: center;
+    transition: border-color 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  }
+  .contact-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-4px);
+  }
+  .contact-icon { font-size: 2rem; display: block; margin-bottom: var(--space-2); }
+  .contact-card h2 { font-size: 1.2rem; }
+  .contact-card p { color: rgba(255, 255, 255, 0.75); margin-top: var(--space-1); }
+
+  @media (min-width: 700px) {
+    .contact-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+interface FAQItem { question: string; answer: string }
+interface Props { items: FAQItem[] }
+const { items } = Astro.props;
+---
+
+<section class="faq">
+  <div class="container">
+    <h2 data-reveal>Preguntas <span class="accent-pink">frecuentes</span></h2>
+    <div class="faq-list" data-reveal>
+      {items.map((item, i) => (
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" aria-controls={`faq-a-${i}`}>
+            <span>{item.question}</span>
+            <span class="chevron" aria-hidden="true">↓</span>
+          </button>
+          <div class="faq-answer" id={`faq-a-${i}`}>
+            <p>{item.answer}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5); }
+  .faq h2 { text-align: center; margin-bottom: var(--space-4); }
+  .accent-pink { color: var(--color-pink); }
+  .faq-list { max-width: 760px; margin-inline: auto; display: grid; gap: var(--space-1); }
+  .faq-item { border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; overflow: hidden; }
+  .faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    background: none;
+    border: none;
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.9rem 1.1rem;
+    cursor: pointer;
+    text-align: left;
+  }
+  .chevron { transition: transform 0.25s var(--ease-out); flex-shrink: 0; }
+  .faq-question[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s var(--ease-out);
+  }
+  .faq-answer > p {
+    overflow: hidden;
+    min-height: 0;
+    margin: 0;
+    padding: 0 1.1rem;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.92rem;
+  }
+  .faq-item.is-open .faq-answer { grid-template-rows: 1fr; }
+  .faq-item.is-open .faq-answer > p { padding-bottom: 1rem; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.faq-item').forEach((item) => {
+    const btn = item.querySelector('button');
+    btn?.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+</script>

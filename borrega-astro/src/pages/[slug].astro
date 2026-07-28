@@ -1,0 +1,29 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { getAllPages } from '../lib/wp';
+import { cleanElementorHtml } from '../lib/cleanContent';
+import { EXCLUDED_SLUGS as EXCLUDED_SLUGS_LIST } from '../lib/pageSlugs';
+
+export async function getStaticPaths() {
+  // Paginas que NO se generan con esta plantilla generica porque tienen
+  // tratamiento especial en otro lado (home) o no son contenido publico
+  // real (pagina de pruebas internas). Lista compartida con sitemap.xml.ts
+  // en src/lib/pageSlugs.ts para no duplicarla ni que se desincronicen.
+  const EXCLUDED_SLUGS = new Set(EXCLUDED_SLUGS_LIST);
+  const pages = await getAllPages();
+  return pages
+    .filter((p) => !EXCLUDED_SLUGS.has(p.slug))
+    .map((p) => ({
+      params: { slug: p.slug },
+      props: { page: p },
+    }));
+}
+
+const { page } = Astro.props;
+const content = cleanElementorHtml(page.content.rendered);
+const title = page.title.rendered.replace(/&#8211;|–/g, '-').replace(/&amp;/g, '&');
+---
+
+<PageLayout title={title}>
+  <Fragment set:html={content} />
+</PageLayout>

@@ -1,0 +1,202 @@
+@keyframes spin {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(360deg)
+    }
+}
+
+#ob-wdkit-elementorp .ob-main-container {
+    width: 795px;
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,.2);
+    position: relative;
+    padding: 20px 20px 0;
+    overflow: hidden;
+    align-items: center;
+    gap: 30px
+}
+
+#ob-wdkit-elementorp.dialog-type-lightbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center
+}
+
+#ob-wdkit-elementorp.dialog-type-lightbox .dialog-widget-content {
+    top: unset!important;
+    left: unset!important;
+    border-radius: 10px
+}
+
+#ob-wdkit-elementorp .ob-top-sections {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%
+}
+
+#ob-wdkit-elementorp .ob-top-sections .ob-message a {
+    font-family: "Plus Jakarta Sans",sans-serif;
+    font-size: 10px;
+    color: #020202;
+    line-height: 14px;
+    font-weight: 400;
+    position: relative;
+    text-decoration: none;
+    display: inline-block
+}
+
+#ob-wdkit-elementorp .ob-top-sections .ob-message .ob-not-show-again:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left
+}
+
+#ob-wdkit-elementorp .ob-top-sections .ob-close-btn {
+    color: #000000;
+    font-size: 18px;
+    cursor: pointer
+}
+
+#ob-wdkit-elementorp .ob-middel-sections {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center
+}
+
+#ob-wdkit-elementorp .ob-middel-sections .ob-text-top {
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    color: #020202;
+    /* margin-bottom: 20px */
+}
+
+#ob-wdkit-elementorp .ob-middel-sections .ob-text-bottom {
+    font-size: 12px;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #020202;
+}
+
+#ob-wdkit-elementorp .ob-middel-sections .ob-learn-more-about {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center
+}
+
+#ob-wdkit-elementorp .ob-middel-sections .ob-learn-more-about .ob-wdesign-install {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-around;
+    gap: 10px;
+    background-color: #020202;
+    border: 0;
+    color: #fff;
+    padding: 14px 38px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    cursor: pointer;
+    position: relative;
+}
+
+#ob-wdkit-elementorp .ob-middel-sections .ob-learn-more-about a {
+    color: #020202;
+    text-decoration: none;
+    font-size: 12px
+}
+
+#ob-wdkit-elementorp .ob-wdesign-about,
+#ob-wdkit-elementorp .ob-wdesign-install .ob-enable-text,
+#ob-wdkit-elementorp .ob-wdesign-install .ob-visit-plugin {
+    line-height: 14px;
+    font-weight: 400;
+    position: relative;
+    text-decoration: none;
+    display: inline-block
+}
+
+#ob-wdkit-elementorp .ob-top-sections .ob-message .ob-not-show-again::after,
+#ob-wdkit-elementorp .ob-wdesign-about::after,
+#ob-wdkit-elementorp .ob-wdesign-install .ob-enable-text::after,
+#ob-wdkit-elementorp .ob-wdesign-install .ob-visit-plugin::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1.5px;
+    bottom: -2px;
+    left: 0;
+    background-color: #000000;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform .25s ease-out
+}
+
+#ob-wdkit-elementorp .ob-wdesign-about:hover::after,
+/* #ob-wdkit-elementorp .ob-wdesign-install .ob-enable-text:hover::after, */
+#ob-wdkit-elementorp .ob-wdesign-install .ob-visit-plugin:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left
+}
+
+#ob-wdkit-elementorp .ob-image-sections {
+    display: flex;
+    width: 792px;
+    height: 236px;
+    position: relative;
+    background-image: url(images/wdkit-frame.png);
+    background-size: cover
+}
+
+#ob-wdkit-elementorp .ob-wdesign-install .ob-wkit-publish-loader {
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+}
+
+#ob-wdkit-elementorp .ob-wdesign-install .ob-wkit-publish-loader .ob-wb-loader-circle {
+    display: none;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    width: 18px;
+    border-top: 4px solid #ffffff59;
+    height: 18px;
+    -webkit-animation: spin 1.5s linear infinite;
+    animation: spin 1.5s linear infinite
+}
+
+@media (max-width:768px) {
+    #ob-wdkit-elementorp .ob-middel-sections .ob-text-bottom {
+        font-size: 10px
+    }
+
+    #ob-wdkit-elementorp .ob-middel-sections .ob-text-top {
+        font-size: 15px
+    }
+}
+
+@media (max-width:480px) {
+    .ob-middel-sections .ob-text-bottom {
+        font-size: 9px
+    }
+
+    #ob-wdkit-elementorp .ob-wdesign-install {
+        padding: 6px 12px
+    }
+}

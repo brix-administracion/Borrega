@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortfolioHero from '../components/portfolio/PortfolioHero.astro';
+import SocialShowcase from '../components/portfolio/SocialShowcase.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+
+import g1mockup from '../assets/images/portfolio/rrss/g1-mockup.png';
+import g1p1 from '../assets/images/portfolio/rrss/g1-post-1.jpg';
+import g1p2 from '../assets/images/portfolio/rrss/g1-post-2.jpg';
+import g1p3 from '../assets/images/portfolio/rrss/g1-post-3.jpg';
+
+import g2mockup from '../assets/images/portfolio/rrss/g2-mockup.png';
+import g2p1 from '../assets/images/portfolio/rrss/g2-post-1.jpg';
+import g2p2 from '../assets/images/portfolio/rrss/g2-post-2.jpg';
+import g2p3 from '../assets/images/portfolio/rrss/g2-post-3.jpg';
+
+import g3mockup from '../assets/images/portfolio/rrss/g3-mockup.png';
+import g3p1 from '../assets/images/portfolio/rrss/g3-post-1.jpg';
+import g3p2 from '../assets/images/portfolio/rrss/g3-post-2.jpg';
+import g3p3 from '../assets/images/portfolio/rrss/g3-post-3.jpg';
+
+import g4mockup from '../assets/images/portfolio/rrss/g4-mockup.png';
+import g4p1 from '../assets/images/portfolio/rrss/g4-post-1.jpg';
+import g4p2 from '../assets/images/portfolio/rrss/g4-post-2.jpg';
+import g4p3 from '../assets/images/portfolio/rrss/g4-post-3.jpg';
+
+import g5mockup from '../assets/images/portfolio/rrss/g5-mockup.png';
+import g5p1 from '../assets/images/portfolio/rrss/g5-post-1.jpg';
+import g5p2 from '../assets/images/portfolio/rrss/g5-post-2.jpg';
+import g5p3 from '../assets/images/portfolio/rrss/g5-post-3.jpg';
+
+import g6mockup from '../assets/images/portfolio/rrss/g6-mockup.png';
+import g6p1 from '../assets/images/portfolio/rrss/g6-post-1.jpg';
+import g6p2 from '../assets/images/portfolio/rrss/g6-post-2.jpg';
+import g6p3 from '../assets/images/portfolio/rrss/g6-post-3.jpg';
+
+const groups = [
+  { mockup: g1mockup, posts: [g1p1, g1p2, g1p3] },
+  { mockup: g2mockup, posts: [g2p1, g2p2, g2p3] },
+  { mockup: g3mockup, posts: [g3p1, g3p2, g3p3] },
+  { mockup: g4mockup, posts: [g4p1, g4p2, g4p3] },
+  { mockup: g5mockup, posts: [g5p1, g5p2, g5p3] },
+  { mockup: g6mockup, posts: [g6p1, g6p2, g6p3] },
+];
+---
+
+<BaseLayout title="Portfolio Redes Sociales — Börrega" description="Gestión de contenido y diseño de redes sociales para marcas.">
+  <PortfolioHero title="Portfolio Redes Sociales" />
+  <SocialShowcase groups={groups} />
+  <ServiceFinalCTA titleHtml="Pedir <span class='hl'>Cotización</span>" ctaLabel="PEDIR COTIZACIÓN" ctaHref="/contacto" />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+</style>

@@ -1,0 +1,75 @@
+.pilar-scheduler-container * { box-sizing: border-box; margin: 0; padding: 0; }
+.pilar-scheduler-container {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a0a;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+.pilar-scheduler-container .wrapper {
+    width: 100%;
+    max-width: 700px;
+    background: #1a1a1a;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    border: 1px solid #2a2a2a;
+    position: relative;
+    overflow: hidden;
+}
+.pilar-scheduler-container .progress-bar { height: 4px; background: #2a2a2a; }
+.pilar-scheduler-container .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed 0%, #a855f7 100%);
+    width: 33%;
+    transition: width 0.4s ease;
+}
+.pilar-scheduler-container .content { padding: 48px 40px; }
+.pilar-scheduler-container .logo-container { text-align: center; margin-bottom: 32px; }
+.pilar-scheduler-container .logo-container svg { width: 120px; height: auto; }
+.pilar-scheduler-container .header { margin-bottom: 32px; text-align: center; }
+.pilar-scheduler-container h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #ffffff; margin-bottom: 8px; }
+.pilar-scheduler-container h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #ffffff; }
+.pilar-scheduler-container .subtitle { color: #b0b0b0; font-size: 14px; margin-bottom: 16px; }
+.pilar-scheduler-container .description {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1); padding: 16px; border-radius: 12px; font-size: 13px; color: #a0a0a0; line-height: 1.6;
+}
+.pilar-scheduler-container .step-indicator { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; font-size: 12px; color: #707070; }
+.pilar-scheduler-container .step { display: flex; align-items: center; gap: 6px; }
+.pilar-scheduler-container .step-num { width: 24px; height: 24px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+.pilar-scheduler-container .step.active .step-num { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: #fff; }
+.pilar-scheduler-container .step.completed .step-num { background: #7c3aed; color: #fff; }
+.pilar-scheduler-container .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.pilar-scheduler-container .calendar-header button { background: transparent; border: 1px solid #404040; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #b0b0b0; transition: all 0.2s; }
+.pilar-scheduler-container .calendar-header button:hover { border-color: #707070; color: #ffffff; }
+.pilar-scheduler-container .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.pilar-scheduler-container .day-label { text-align: center; font-size: 11px; font-weight: 600; color: #707070; text-transform: uppercase; padding: 12px 0; }
+.pilar-scheduler-container .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: 1px solid #2a2a2a; border-radius: 8px; font-size: 14px; background: #0f0f0f; color: #505050; }
+.pilar-scheduler-container .day-cell.available { color: #ffffff; background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%); border-color: #404040; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.pilar-scheduler-container .day-cell.available:hover { background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%); border-color: #707070; box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); }
+.pilar-scheduler-container .day-cell.selected { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: #fff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+.pilar-scheduler-container .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+.pilar-scheduler-container .week-day { text-align: center; }
+.pilar-scheduler-container .week-day-label { font-size: 11px; font-weight: 600; color: #707070; text-transform: uppercase; margin-bottom: 8px; }
+.pilar-scheduler-container .week-day-num { font-size: 13px; color: #b0b0b0; margin-bottom: 12px; }
+.pilar-scheduler-container .slots { display: flex; flex-direction: column; gap: 6px; }
+.pilar-scheduler-container .slot { padding: 10px; border: 1px solid #2a2a2a; border-radius: 8px; background: #0f0f0f; cursor: pointer; font-size: 12px; font-weight: 500; color: #b0b0b0; transition: all 0.2s; }
+.pilar-scheduler-container .slot:hover { border-color: #404040; background: #1a1a1a; color: #ffffff; }
+.pilar-scheduler-container .slot.selected { border: 2px solid #7c3aed; background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%); color: #a855f7; }
+.pilar-scheduler-container .week-unavailable { opacity: 0.4; }
+.pilar-scheduler-container .form-group { margin-bottom: 16px; text-align: left; }
+.pilar-scheduler-container label { display: block; font-size: 12px; color: #b0b0b0; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.pilar-scheduler-container input, .pilar-scheduler-container textarea { width: 100%; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 8px; font-size: 14px; font-family: 'SF Pro Display', sans-serif; background: #0f0f0f; color: #ffffff; transition: all 0.2s; }
+.pilar-scheduler-container input:focus, .pilar-scheduler-container textarea:focus { outline: none; border-color: #707070; background: #1a1a1a; }
+.pilar-scheduler-container .selected-info { background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1); }
+.pilar-scheduler-container .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'SF Pro Display', sans-serif; }
+.pilar-scheduler-container .btn-primary { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: #fff; }
+.pilar-scheduler-container .btn-primary:hover { background: linear-gradient(135deg, #6d28d9 0%, #9333ea 100%); box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3); }
+.pilar-scheduler-container .btn-secondary { background: transparent; color: #ffffff; border: 1px solid #404040; }
+.pilar-scheduler-container .btn-back { display: inline-block; margin-bottom: 20px; font-size: 12px; color: #707070; cursor: pointer; background: transparent; border: none; padding: 4px 0; font-family: inherit; }
+.pilar-scheduler-container .btn-back:hover { color: #ffffff; }
+.pilar-scheduler-container .success { text-align: center; padding: 20px 0; }
+.pilar-scheduler-container .success-icon { font-size: 48px; margin-bottom: 16px; color: #a855f7; }
+.pilar-scheduler-container .hidden { display: none !important; }

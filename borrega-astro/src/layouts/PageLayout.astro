@@ -1,0 +1,78 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={`${title} — Börrega Studio`} description={description}>
+  <section class="page-hero">
+    <div class="container">
+      <h1 data-reveal>{title}</h1>
+    </div>
+  </section>
+  <article class="page-content container">
+    <slot />
+  </article>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg);
+    color: var(--color-white);
+    padding-block: var(--space-5) var(--space-4);
+  }
+  .page-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    max-width: 24ch;
+  }
+  .page-content {
+    padding-block: var(--space-5);
+    max-width: 840px;
+  }
+  .page-content :global(h2) {
+    font-size: 1.6rem;
+    margin-top: var(--space-4);
+  }
+  .page-content :global(h3) {
+    font-size: 1.25rem;
+    margin-top: var(--space-3);
+  }
+  .page-content :global(p) {
+    margin-bottom: var(--space-2);
+    color: #333;
+  }
+  .page-content :global(ul),
+  .page-content :global(ol) {
+    margin-bottom: var(--space-2);
+    padding-left: 1.4rem;
+    color: #333;
+  }
+  .page-content :global(li) { margin-bottom: 0.4rem; }
+  .page-content :global(a:not(.btn)) {
+    color: var(--color-secondary);
+    text-decoration: underline;
+  }
+  .page-content :global(.btn) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    margin-block: var(--space-2);
+  }
+  .page-content :global(.btn:hover) {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+  .page-content :global(img) {
+    border-radius: var(--radius-md);
+    margin-block: var(--space-3);
+  }
+  .page-content :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-2);
+    font-style: italic;
+    color: #555;
+  }
+</style>

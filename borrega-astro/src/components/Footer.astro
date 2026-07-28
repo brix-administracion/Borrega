@@ -1,0 +1,109 @@
+---
+const year = new Date().getFullYear();
+---
+
+<section class="cta-band container" data-reveal>
+  <div class="squares squares-left" aria-hidden="true">
+    {Array.from({length: 8}).map(() => <span class="sq sq-purple"></span>)}
+  </div>
+  <div class="squares squares-right" aria-hidden="true">
+    {Array.from({length: 8}).map(() => <span class="sq sq-orange"></span>)}
+  </div>
+
+  <div class="cta-card">
+    <h3>Estamos para <span class="accent-pink">ayudar</span></h3>
+    <p>Contactanos, contanos que necesitás. Trabajemos juntos.</p>
+    <a href="mailto:info@borregastudio.com" class="btn">ESCRIBINOS</a>
+  </div>
+  <div class="cta-card">
+    <img src="/images/deco/blob-kiss.png" alt="" class="deco-kiss" width="60" height="76" id="deco-kiss" />
+    <h3>¿Querés sumarte al <span class="accent-pink">rebaño</span>?</h3>
+    <p>Si te sobran ganas, si creés que tenés algo que aportar o si sólo te querés tirar el lance.</p>
+    <a href="/sumate" class="btn">POSTULATE</a>
+  </div>
+</section>
+
+<script>
+  import { initMouseTilt } from '../scripts/mouseTilt';
+  initMouseTilt('#deco-kiss');
+</script>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span class="footer-logo">börrega</span>
+    <p class="footer-contact">
+      BUENOS AIRES · <a href="mailto:info@borregastudio.com">INFO@BORREGASTUDIO.COM</a> · <a href="tel:+5491171327309">+54 9 11 7132-7309</a>
+    </p>
+    <p class="footer-legal">© {year} Börrega Studio. Todos los derechos reservados. <a href="/politicas-de-privacidad">Políticas de privacidad</a></p>
+  </div>
+</footer>
+
+<style>
+  .cta-band {
+    background: var(--color-bg);
+    padding-block: var(--space-6);
+    display: grid;
+    gap: var(--space-3);
+    position: relative;
+  }
+  .cta-card {
+    background: #16161a;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    text-align: center;
+    position: relative;
+  }
+  .cta-card h3 { color: var(--color-white); }
+  .accent-pink { color: var(--color-pink); }
+  .cta-card p { color: rgba(255,255,255,0.75); max-width: 32ch; margin-inline: auto; }
+  .cta-card .btn { margin-top: var(--space-2); }
+  .deco-kiss {
+    position: absolute;
+    top: -30px;
+    right: 24px;
+    width: 44px;
+    height: auto;
+  }
+
+  .squares { display: none; }
+  @media (min-width: 1100px) {
+    .squares {
+      position: absolute;
+      top: 10%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .squares-left { left: -2%; }
+    .squares-right { right: -2%; }
+    .sq { width: 14px; height: 14px; border-radius: 3px; }
+    .sq-purple { background: var(--color-secondary); }
+    .sq-orange { background: var(--color-orange); }
+  }
+
+  .site-footer {
+    background: var(--color-secondary);
+    color: var(--color-white);
+    padding-block: var(--space-4);
+  }
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  .footer-contact a { text-decoration: underline; }
+  .footer-legal { font-size: 0.8rem; opacity: 0.85; }
+  .footer-legal a { text-decoration: underline; }
+
+  @media (min-width: 700px) {
+    .cta-band { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 900px) {
+    .footer-inner { flex-direction: row; align-items: center; justify-content: space-between; }
+  }
+</style>

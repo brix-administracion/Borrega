@@ -1,0 +1,37 @@
+---
+interface Props {
+  titleHtml: string;
+  text?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+const { titleHtml, text, ctaLabel = 'AGENDAR REUNIÓN', ctaHref = '/reservar-consulta' } = Astro.props;
+---
+
+<section class="final-cta">
+  <div class="container">
+    <div class="card" data-reveal>
+      <img src="/images/deco/apa-blob.png" alt="" class="deco" width="80" height="40" />
+      <h2 set:html={titleHtml} />
+      {text && <p>{text}</p>}
+      <a href={ctaHref} class="btn">{ctaLabel}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .final-cta { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5); }
+  .card {
+    position: relative;
+    background: #16161a;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    text-align: center;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .card h2 { font-size: 1.8rem; }
+  .card p { color: rgba(255,255,255,0.75); margin-block: var(--space-2); }
+  .card .btn { border-color: var(--color-white); margin-top: var(--space-1); }
+  .deco { position: absolute; top: -20px; right: 24px; }
+</style>

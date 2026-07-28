@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortfolioHero from '../components/portfolio/PortfolioHero.astro';
+import CaseStudyList from '../components/portfolio/CaseStudyList.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+
+import coltix1 from '../assets/images/portfolio/branding/coltix-1.png';
+import coltix2 from '../assets/images/portfolio/branding/coltix-2.png';
+import coltix3 from '../assets/images/portfolio/branding/coltix-3.png';
+import jiro1 from '../assets/images/portfolio/branding/jiro-1.jpg';
+import jiro2 from '../assets/images/portfolio/branding/jiro-2.jpg';
+import mejoral1 from '../assets/images/portfolio/branding/mejoral-1.jpg';
+import siandra1 from '../assets/images/portfolio/branding/siandra-1.jpg';
+import siandra2 from '../assets/images/portfolio/branding/siandra-2.jpg';
+import gallium1 from '../assets/images/portfolio/branding/gallium-1.jpg';
+import gallium2 from '../assets/images/portfolio/branding/gallium-2.jpg';
+import madero1 from '../assets/images/portfolio/branding/madero-1.gif';
+import madero2 from '../assets/images/portfolio/branding/madero-2.jpg';
+import telecentro1 from '../assets/images/portfolio/branding/telecentro-1.jpg';
+import telecentro2 from '../assets/images/portfolio/branding/telecentro-2.jpg';
+
+const attribution = '* Trabajo realizado para Estudio Dandy';
+
+const items = [
+  {
+    title: 'Coltix',
+    text: 'COLTIX es la marca de gotas oftalmológicas de Gramon Millet. Este proyecto comenzó con el desarrollo de las marcas para la familia de productos, en la cual se buscó una paleta cromática fresca, moderna y una morfología de fácil pregnancia que reflejara la finalidad del producto. Junto a esto se desarrolló el diseño de packaging y diversos elementos promocionales para puntos de venta, siguiendo siempre una estética definida y pulida.',
+    attribution,
+    images: [coltix1, coltix2, coltix3],
+  },
+  {
+    title: 'Jiro Sushi',
+    text: 'Jiro Ono, de 85 años de edad, es considerado el mejor chef del mundo de sushi y tesoro nacional de Japón. Y este sushi local busca hacer honor al gran Jiro. Se trabajó un logo a partir de su caricatura y se realizaron piezas de cartelería y packaging para el lanzamiento de la marca, que actualmente cuenta con 25 locales.',
+    images: [jiro1, jiro2],
+  },
+  {
+    title: 'Mejoral - Rebranding',
+    text: 'Línea Antifebril y Analgésica de gran trayectoria, recomendado para eliminar fiebre y dolores leves. Actualmente está siendo desplazada por otra droga que si bien es más potente, los padres la suministran innecesariamente en cuadros leves. La búsqueda del rebranding se basó en modernizar la marca, aportar calidez y suavidad en representación de su efecto e inclusión de miembros de crianza.',
+    attribution,
+    images: [mejoral1],
+  },
+  {
+    title: 'Siandra',
+    text: 'Siandra es una marca de accesorios de piel y cuero actualmente con base en Tulum. El diseño de marca tuvo como objetivo la inclusión de animal de clima tropical y uso de la inicial como pedidos específicos de cliente. Se trabajó con la serpiente por su cambio de piel y se buscó una paleta cromática neutra pero con identidad. Se realizaron aplicaciones a packaging, merchandising y papelería.',
+    images: [siandra1, siandra2],
+  },
+  {
+    title: 'Gallium',
+    text: 'Galium Consulting es una consultora que brinda asesoramiento a empresas del rubro físico-químico. Se trabajó desde el naming hasta la aplicación del nuevo branding en diferentes soportes y piezas. El Galio (Ga) es un elemento de la tabla periódica que tiene como característica cambiar de estado (flexibilidad al cambio) a temperaturas ambiente y cuando se solidifica se expande al igual que las empresas asesoradas por esta consultora.',
+    attribution,
+    images: [gallium1, gallium2],
+  },
+  {
+    title: 'Madero First - Rebranding',
+    text: 'Cuando nos contactaron de Madero First algo estaba muy claro. No era cualquier revista barrial porque no era de cualquier barrio. La revista de Puerto Madero debía ser totalmente representativa. Se trabajó con conceptos como el lujo, el orden y el diseño de vanguardia para rediseñar el logo y darle vida. Los mismos conceptos se aplicaron a la papelería y a la revista, con un diseño que cuidaba los detalles pero sin recargar las piezas.',
+    images: [madero1, madero2],
+  },
+  {
+    title: 'Telecentro - Rebranding',
+    text: 'Telecentro es una de las compañías de telecomunicaciones líder en el país. Hemos trabajado hace mucho tiempo y hemos rediseñado numerosas veces la marca además de haber generado marcas específicas para productos. Se trabaja cada marca siguiendo lineamientos preestablecidos pero brindándole a cada una su propia identidad. Trabajamos constantemente para comunicar todos los servicios de Telecentro en Redes, Vía Pública, TV y Web (Precision Mkt).',
+    attribution,
+    images: [telecentro1, telecentro2],
+  },
+];
+---
+
+<BaseLayout title="Portfolio Branding — Börrega" description="Desarrollo de marca, rebranding y packaging para empresas y productos.">
+  <PortfolioHero title="Portfolio Branding" />
+  <CaseStudyList items={items} />
+  <ServiceFinalCTA titleHtml="Pedir <span class='hl'>Cotización</span>" ctaLabel="PEDIR COTIZACIÓN" ctaHref="/contacto" />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+</style>

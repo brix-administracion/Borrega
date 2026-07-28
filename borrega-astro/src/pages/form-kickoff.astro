@@ -1,0 +1,346 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GradientHero from '../components/GradientHero.astro';
+
+const canales = [
+  { value: 'sitio-web', label: 'Sitio web / Landing pages' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'facebook', label: 'Facebook' },
+  { value: 'twitter', label: 'X / Twitter' },
+  { value: 'tiktok', label: 'TikTok' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'email-marketing', label: 'Email marketing / Newsletter' },
+  { value: 'crm', label: 'Comunicaciones CRM', sub: 'Notificaciones, onboarding, retención' },
+  { value: 'paid-media', label: 'Paid media / Publicidad digital' },
+  { value: 'whatsapp', label: 'WhatsApp / Mensajería directa' },
+];
+
+const datosUsuarios = [
+  { value: 'crm-db', label: 'Base de datos CRM', sub: 'Usuarios activos, inactivos, VIP' },
+  { value: 'analytics', label: 'Analytics de plataforma', sub: 'Google Analytics, Firebase, datos propios' },
+  { value: 'encuestas', label: 'Encuestas o estudios de usuario' },
+  { value: 'soporte', label: 'Datos de soporte / atención al cliente', sub: 'Motivos de consulta, quejas frecuentes' },
+  { value: 'sin-datos', label: 'No tenemos datos estructurados disponibles' },
+];
+
+const materialesMarca = [
+  { value: 'logos', label: 'Logos y assets visuales' },
+  { value: 'brandbook', label: 'Brand book o manual de identidad' },
+  { value: 'campanas', label: 'Campañas anteriores' },
+  { value: 'estrategia', label: 'Documentos de estrategia' },
+  { value: 'competencia', label: 'Análisis de competencia propio' },
+  { value: 'sin-materiales', label: 'No hay materiales organizados disponibles' },
+];
+---
+
+<BaseLayout title="Kickoff Audit — Börrega Studio" description="Formulario de kick-off para arrancar el proyecto de auditoría de comunicación." noindex>
+  <GradientHero>
+    Kickoff Audit
+    <Fragment slot="subtitle">Este formulario toma entre 10 y 15 minutos. Al enviarlo, la información llega directo a nuestro equipo.</Fragment>
+  </GradientHero>
+
+  <section class="kickoff-form-section">
+    <div class="container">
+      <form id="kickoff-form" class="web-form" enctype="multipart/form-data">
+        <input type="hidden" name="subject" value="Nuevo kick-off recibido" />
+        <input type="text" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <fieldset class="form-section">
+          <h2><span class="step-icon">🔍</span> 01 · Canales y contenido actual</h2>
+
+          <div class="form-field">
+            <label>Canales digitales activos *</label>
+            <p class="hint">Seleccioná los que apliquen — podés ingresar la URL de cada uno</p>
+            <div class="checkbox-group">
+              {
+                canales.map((c) => (
+                  <label class="checkbox-row">
+                    <input type="checkbox" name="canales_activos" value={c.label} />
+                    <span>
+                      {c.label}
+                      {c.sub && <span class="sub">{c.sub}</span>}
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="canales-urls">URLs de cada canal seleccionado</label>
+            <textarea id="canales-urls" name="canales_urls" placeholder="Ej: Instagram — instagram.com/tu_marca"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="quien-maneja">¿Quién maneja el contenido en cada canal?</label>
+            <textarea id="quien-maneja" name="quien_maneja_contenido"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label>¿Tienen alguna guía de marca existente? *</label>
+            <div class="checkbox-group">
+              <label class="checkbox-row"><input type="radio" name="guia_marca" value="Sí, completa y en uso" required /> Sí, completa y en uso</label>
+              <label class="checkbox-row"><input type="radio" name="guia_marca" value="Sí, pero desactualizada" /> Sí, pero desactualizada</label>
+              <label class="checkbox-row"><input type="radio" name="guia_marca" value="Solo criterios informales" /> Solo criterios informales</label>
+              <label class="checkbox-row"><input type="radio" name="guia_marca" value="No existe nada" /> No existe nada</label>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="mayor-problema">¿Cuál es el mayor problema con el contenido actual? *</label>
+            <textarea id="mayor-problema" name="mayor_problema_contenido" required></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="canal-inconsistente">¿Qué canal genera más inconsistencias?</label>
+            <input type="text" id="canal-inconsistente" name="canal_inconsistente" />
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <h2><span class="step-icon">🗺️</span> 02 · Competidores y mercado</h2>
+
+          <div class="form-field">
+            <label>5 competidores más relevantes *</label>
+            <div class="competitor-grid">
+              <input type="text" name="competidor_1" placeholder="1" required />
+              <input type="text" name="competidor_2" placeholder="2" />
+              <input type="text" name="competidor_3" placeholder="3" />
+              <input type="text" name="competidor_4" placeholder="4" />
+              <input type="text" name="competidor_5" placeholder="5" />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="competidor-referente">¿Hay algún competidor referente?</label>
+            <input type="text" id="competidor-referente" name="competidor_referente" />
+          </div>
+
+          <div class="form-field">
+            <label for="competidor-preocupa">¿Hay algún competidor que les preocupe?</label>
+            <input type="text" id="competidor-preocupa" name="competidor_preocupa" />
+          </div>
+
+          <div class="form-field">
+            <label for="mercados-actuales">Mercados actuales</label>
+            <input type="text" id="mercados-actuales" name="mercados_actuales" />
+          </div>
+
+          <div class="form-field">
+            <label for="mercados-objetivo">Mercados objetivo (12 meses)</label>
+            <input type="text" id="mercados-objetivo" name="mercados_objetivo" />
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <h2><span class="step-icon">👥</span> 03 · Audiencias y usuarios</h2>
+
+          <div class="form-field">
+            <label>¿Qué datos de usuarios tienen disponibles? *</label>
+            <p class="hint">Seleccioná y adjuntá el archivo correspondiente más abajo</p>
+            <div class="checkbox-group">
+              {
+                datosUsuarios.map((d) => (
+                  <label class="checkbox-row">
+                    <input type="checkbox" name="datos_usuarios" value={d.label} />
+                    <span>
+                      {d.label}
+                      {d.sub && <span class="sub">{d.sub}</span>}
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="datos-usuarios-file">Adjuntar archivo de datos de usuarios</label>
+            <input type="file" id="datos-usuarios-file" name="attachment_datos_usuarios" multiple />
+          </div>
+
+          <div class="form-field">
+            <label for="segmentos">Descripción de cada segmento de usuario *</label>
+            <textarea id="segmentos" name="descripcion_segmentos" required></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="quien-conoce-segmento">¿Quién del equipo conoce mejor a cada segmento?</label>
+            <input type="text" id="quien-conoce-segmento" name="quien_conoce_segmento" />
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <h2><span class="step-icon">🔑</span> 04 · Accesos y materiales</h2>
+
+          <div class="form-field">
+            <label>¿Cómo nos dan acceso a sus canales? *</label>
+            <div class="checkbox-group">
+              <label class="checkbox-row"><input type="radio" name="tipo_acceso" value="Acceso de lectura directa" required /> Acceso de lectura directa</label>
+              <label class="checkbox-row"><input type="radio" name="tipo_acceso" value="Export / descarga" /> Export / descarga</label>
+              <label class="checkbox-row"><input type="radio" name="tipo_acceso" value="Carpeta compartida" /> Carpeta compartida</label>
+              <label class="checkbox-row"><input type="radio" name="tipo_acceso" value="Lo coordinamos" /> Lo coordinamos</label>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>¿Tienen materiales de marca para compartir?</label>
+            <p class="hint">Aunque estén incompletos — adjuntá lo que tengan más abajo</p>
+            <div class="checkbox-group">
+              {
+                materialesMarca.map((m) => (
+                  <label class="checkbox-row">
+                    <input type="checkbox" name="materiales_marca" value={m.label} />
+                    {m.label}
+                  </label>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="materiales-file">Adjuntar materiales de marca</label>
+            <input type="file" id="materiales-file" name="attachment_materiales" multiple />
+          </div>
+
+          <div class="date-grid">
+            <div class="form-field">
+              <label for="fecha-accesos">Fecha límite para accesos</label>
+              <input type="date" id="fecha-accesos" name="fecha_limite_accesos" />
+            </div>
+            <div class="form-field">
+              <label for="fecha-materiales">Fecha límite para materiales</label>
+              <input type="date" id="fecha-materiales" name="fecha_limite_materiales" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <h2><span class="step-icon">⚖️</span> 05 · Contexto regulatorio</h2>
+
+          <div class="form-field">
+            <label for="restricciones">¿Tienen restricciones de comunicación frecuentes?</label>
+            <textarea id="restricciones" name="restricciones_comunicacion"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label>¿El equipo legal revisa el contenido antes de publicar? *</label>
+            <div class="checkbox-group">
+              <label class="checkbox-row"><input type="radio" name="revision_legal" value="Siempre, todo" required /> Siempre, todo</label>
+              <label class="checkbox-row"><input type="radio" name="revision_legal" value="Solo campañas pagas" /> Solo campañas pagas</label>
+              <label class="checkbox-row"><input type="radio" name="revision_legal" value="Solo cuando hay dudas" /> Solo cuando hay dudas</label>
+              <label class="checkbox-row"><input type="radio" name="revision_legal" value="No hay proceso formal" /> No hay proceso formal</label>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="mercados-restrictivos">¿En qué mercados tienen restricciones más estrictas?</label>
+            <input type="text" id="mercados-restrictivos" name="mercados_restrictivos" />
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <h2><span class="step-icon">📋</span> 06 · Coordinación</h2>
+
+          <div class="form-field">
+            <label for="contacto-nombre">Nombre del contacto principal *</label>
+            <input type="text" id="contacto-nombre" name="name" required />
+          </div>
+
+          <div class="form-field">
+            <label for="contacto-cargo">Cargo</label>
+            <input type="text" id="contacto-cargo" name="cargo_contacto" />
+          </div>
+
+          <div class="form-field">
+            <label for="contacto-email">Email *</label>
+            <input type="email" id="contacto-email" name="email" required />
+          </div>
+
+          <div class="form-field">
+            <label for="contacto-whatsapp">WhatsApp</label>
+            <input type="tel" id="contacto-whatsapp" name="whatsapp" />
+          </div>
+
+          <div class="protocol-box">
+            <p class="protocol-title">Protocolo de comunicación del proyecto</p>
+            <p>📧 Email — Entrega y feedback de materiales</p>
+            <p>💬 WhatsApp — Consultas rápidas y coordinación del día a día</p>
+            <p>📹 Google Meet — Presentaciones y checkpoints</p>
+          </div>
+
+          <div class="form-field">
+            <label for="presentacion-semana4">¿Quiénes estarán en la presentación ejecutiva de la semana 4? *</label>
+            <textarea id="presentacion-semana4" name="presentacion_semana_4" required></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="algo-mas">¿Algo más que el equipo de Börrega deba saber?</label>
+            <textarea id="algo-mas" name="notas_adicionales"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="material-adicional">Material adicional</label>
+            <p class="hint">Formatos: PDF, Word, PowerPoint, Excel, imágenes, ZIP</p>
+            <input type="file" id="material-adicional" name="attachment" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,image/*" />
+          </div>
+        </fieldset>
+
+        <button type="submit" class="btn form-submit-btn" data-form-submit>Enviar información de kick-off →</button>
+        <p class="form-status" data-form-status></p>
+        <p class="form-footnote">Se enviará a Börrega Studio · También se descarga un resumen en .txt</p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initWeb3Form } from '../scripts/web3form';
+  initWeb3Form('kickoff-form', { downloadSummary: true });
+</script>
+
+<style>
+  .kickoff-form-section {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-5);
+  }
+  .web-form {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .hp-field {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .competitor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.6rem;
+  }
+  .date-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+  }
+  .protocol-box {
+    background: var(--color-white);
+    border-radius: 10px;
+    padding: var(--space-3);
+    display: grid;
+    gap: 0.35rem;
+  }
+  .protocol-title {
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .protocol-box p { margin: 0; font-size: 0.92rem; }
+  .form-footnote {
+    text-align: center;
+    font-size: 0.85rem;
+    opacity: 0.6;
+  }
+  @media (max-width: 500px) {
+    .date-grid { grid-template-columns: 1fr; }
+  }
+</style>

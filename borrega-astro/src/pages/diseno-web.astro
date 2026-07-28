@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortfolioHero from '../components/portfolio/PortfolioHero.astro';
+import LinkGrid from '../components/portfolio/LinkGrid.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+
+const columns = [
+  {
+    heading: 'WordPress',
+    items: [
+      { text: 'perpetuowines.com', href: 'https://perpetuowines.com' },
+      { text: 'cva-sa.com', href: 'https://www.cva-sa.com' },
+      { text: 'construcserv.com', href: 'http://construcserv.com' },
+      { text: 'fabricadeinvitaciones.com', href: 'https://fabricadeinvitaciones.com' },
+      { text: 'grupoiess.com', href: 'https://grupoiess.com' },
+      { text: 'mrconsultores.com.ar', href: 'https://mrconsultores.com.ar' },
+      { text: 'enraizados.com.ar', href: 'https://enraizados.com.ar' },
+    ],
+    note: 'Próximamente:',
+    noteItems: ['glitter', 'Sonoff Argentina'],
+  },
+  {
+    heading: 'Tienda Nube',
+    items: [
+      { text: 'sofiaclericilingerie.com', href: 'https://www.sofiaclericilingerie.com' },
+      { text: 'puntoba.com', href: 'https://www.puntoba.com' },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Portfolio Web — Börrega" description="Sitios web desarrollados en WordPress y Tienda Nube.">
+  <PortfolioHero title="Portfolio Web" />
+  <LinkGrid columns={columns} />
+  <ServiceFinalCTA titleHtml="Pedir <span class='hl'>Cotización</span>" ctaLabel="PEDIR COTIZACIÓN" ctaHref="/contacto" />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+</style>

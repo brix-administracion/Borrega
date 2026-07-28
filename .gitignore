@@ -1,0 +1,47 @@
+# === Sistema operativo / editor ===
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# === Node / Astro (borrega-astro) ===
+node_modules/
+borrega-astro/node_modules/
+borrega-astro/dist/
+borrega-astro/.astro/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === Variables de entorno / secretos ===
+.env
+.env.*
+!.env.example
+public_html/wp-config.php
+
+# === WordPress: contenido subido / generado / cache ===
+public_html/wp-content/uploads/
+public_html/wp-content/cache/
+public_html/wp-content/upgrade/
+public_html/wp-content/backup*/
+public_html/wp-content/backups/
+public_html/wp-content/wp-fastest-cache-premium/
+public_html/wp-content/uploads/unlimited_elements_cache/
+
+# === Logs ===
+error_log
+**/error_log
+debug.log
+**/debug.log
+*.log
+
+# === Backups sueltos ===
+*.bak
+*.bk
+public_html/.htaccess.bk
+
+# === Dumps de base de datos ===
+*.sql
+*.sql.gz

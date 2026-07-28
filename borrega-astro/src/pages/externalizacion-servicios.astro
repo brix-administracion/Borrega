@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceHero from '../components/service/ServiceHero.astro';
+import sheepInside from '../assets/images/service/sheep-inside.png';
+import IntroStatement from '../components/service/IntroStatement.astro';
+import Checklist from '../components/service/Checklist.astro';
+import FeatureColumns from '../components/service/FeatureColumns.astro';
+import FAQAccordion from '../components/service/FAQAccordion.astro';
+import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
+---
+
+<BaseLayout title="Börrega Inside — Externalización de Servicios" description="Un equipo de comunicación externo que trabaja de forma continua, integrada y estratégica.">
+  <ServiceHero
+    title="Börrega Inside"
+    variant="photo"
+    image={sheepInside}
+    primaryCta={{ label: 'AGENDAR REUNIÓN', href: '/reservar-consulta' }}
+    secondaryCta={{ label: 'VER SERVICIOS', href: '/#servicios' }}
+  />
+
+  <IntroStatement
+    eyebrowHtml="Muchas empresas necesitan resolver su comunicación diaria, pero <span class='hl-purple'>no cuentan con un equipo interno completo</span> o no quieren asumir los costos y la complejidad de armarlo. Ahí es donde entra la <span class='hl'>Externalización de Servicios</span> (también conocido como Outsourcing)."
+    conclusionHtml="Börrega Inside es <span class='hl'>la solución.</span>"
+  />
+
+  <Checklist
+    heading="Nuestro servicio de externalización es para tu empresa si:"
+    items={[
+      'Necesitás resolver comunicación todos los meses',
+      'Querés un equipo sin armarlo internamente',
+      'Buscás continuidad y criterio estratégico',
+    ]}
+  />
+
+  <IntroStatement eyebrowHtml="<strong>Cómo trabajamos</strong><br/>Creamos un presupuesto personalizado combinando diferentes servicios según las necesidades reales de tu empresa. El resultado es un equipo de comunicación externo que trabaja de forma continua, integrada y estratégica. Nos involucramos como parte del equipo: escuchamos, asesoramos y trabajamos codo a codo." />
+
+  <FeatureColumns
+    columns={[
+      {
+        heading: 'Qué incluye',
+        items: [
+          'Planificación mensual',
+          'Servicios combinados según necesidad',
+          'Acompañamiento continuo',
+          'Interacción directa con equipos internos',
+          'Asesoramiento estratégico',
+        ],
+      },
+      {
+        heading: 'Por qué conviene',
+        items: [
+          'Equipo asignado — Profesionales Senior o superior que conocen tu marca',
+          'Servicio escalable — Ajuste según necesidad y crecimiento',
+          'Fee mensual — Costos predecibles y sin sorpresas',
+        ],
+      },
+    ]}
+  />
+
+  <FAQAccordion
+    items={[
+      { question: '¿Qué es la externalización de servicios de comunicación?', answer: 'Es un modelo donde un estudio externo funciona como el departamento de comunicación de una empresa.' },
+      { question: '¿Reemplaza a un equipo interno?', answer: 'Puede reemplazarlo o complementarlo, según las necesidades del negocio.' },
+      { question: '¿El servicio es fijo o flexible?', answer: 'Es flexible y escalable. En nuestro caso es escalable con 30 días de anticipación.' },
+      { question: '¿Qué tipo de empresas contratan este servicio?', answer: 'Grandes corporaciones que necesitan continuidad, y también pymes que buscan un equipo de comunicación sin armarlo internamente.' },
+    ]}
+  />
+
+  <ServiceFinalCTA titleHtml="Armemos tu <span class='hl'>equipo externo</span>" text="Solicitá una propuesta personalizada." />
+</BaseLayout>
+
+<style>
+  :global(.hl) { color: var(--color-pink); }
+  :global(.hl-purple) { color: var(--color-secondary); }
+</style>

@@ -1,0 +1,73 @@
+---
+interface Props {
+  heading?: string;
+  items: string[];
+  tone?: 'band' | 'plain';
+}
+const { heading, items, tone = 'band' } = Astro.props;
+---
+
+<section class:list={['checklist', `tone-${tone}`]}>
+  <div class="container checklist-grid">
+    {heading && <h2 data-reveal>{heading}</h2>}
+    <ul data-reveal>
+      {items.map((item) => (
+        <li>
+          <span class="check" aria-hidden="true">✓</span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .tone-band {
+    background: var(--color-secondary);
+    color: var(--color-white);
+    padding-block: var(--space-4);
+  }
+  .tone-plain {
+    background: var(--color-bg);
+    color: var(--color-white);
+    padding-block: var(--space-3);
+  }
+  .checklist-grid {
+    display: grid;
+    gap: var(--space-3);
+    align-items: start;
+  }
+  .checklist h2 {
+    font-size: 1.5rem;
+    max-width: 20ch;
+  }
+  .checklist ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+  .checklist li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    font-weight: 600;
+  }
+  .check {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+  .tone-plain .check { background: var(--color-secondary); }
+
+  @media (min-width: 800px) {
+    .checklist-grid { grid-template-columns: 1fr 1.4fr; }
+  }
+</style>

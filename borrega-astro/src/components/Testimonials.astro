@@ -1,0 +1,53 @@
+---
+const testimonials = [
+  {
+    quote: 'Trabajé con Börrega en el rebranding de DOT Hotels como consultora outsource. Un lujo todo el proceso, súper profesional. Entregado en tiempo y forma, muy completo.',
+    name: 'Ezequiel Gladstein',
+    role: 'DOT Hoteles',
+  },
+  {
+    quote: 'Trabajamos desde hace varios años con Börrega Studio en todo lo que es la comunicación interna de RRHH para la empresa y es excelente, tiene una mirada moderna y profesional en todo lo que realiza.',
+    name: 'Flavia Andrea Ibarra',
+    role: 'Bruchou & Funes de Rioja',
+  },
+  {
+    quote: 'Börrega Studio y su Fundadora Pilar Puig Lomez han sido la mejor experiencia que he tenido de servicio, estrategia, creatividad, agilidad y vanguardia.',
+    name: 'Fernanda del Franco',
+    role: 'Remax',
+  },
+];
+---
+
+<section class="testimonials">
+  <div class="container testimonials-grid">
+    {testimonials.map((t) => (
+      <blockquote class="testimonial" data-reveal>
+        <span class="quote-mark" aria-hidden="true">&ldquo;</span>
+        <p>{t.quote}</p>
+        <footer>
+          <strong>{t.name}</strong>
+          <span>{t.role}</span>
+        </footer>
+      </blockquote>
+    ))}
+  </div>
+</section>
+
+<style>
+  .testimonials { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5); }
+  .testimonials-grid { display: grid; gap: var(--space-3); }
+  .testimonial {
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin: 0;
+  }
+  .quote-mark { font-family: var(--font-display); font-size: 2.5rem; color: var(--color-secondary); line-height: 1; }
+  .testimonial p { font-style: italic; opacity: 0.9; }
+  .testimonial footer { display: flex; flex-direction: column; margin-top: var(--space-2); }
+  .testimonial footer span { font-size: 0.85rem; opacity: 0.7; }
+
+  @media (min-width: 900px) {
+    .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
