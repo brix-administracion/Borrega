@@ -1,0 +1,52 @@
+name: Build & Deploy Börrega
+
+# Dispara el build + deploy del sitio Astro cuando:
+#  - WordPress avisa que se publico/edito contenido (repository_dispatch)
+#  - se corre manualmente desde la pestaña Actions (workflow_dispatch)
+#  - se pushea un cambio del front (push a main dentro de borrega-astro/)
+on:
+  repository_dispatch:
+    types: [content-updated]
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'borrega-astro/**'
+      - '.github/workflows/deploy.yml'
+
+concurrency:
+  group: deploy-borrega
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: borrega-astro/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: borrega-astro
+        run: npm ci
+
+      - name: Build (trae el contenido en vivo de WordPress)
+        working-directory: borrega-astro
+        run: npm run build
+        env:
+          WP_BASE_URL: https://www.borregastudio.com
+
+      - name: Deploy a Hostinger por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          local-dir: borrega-astro/dist/

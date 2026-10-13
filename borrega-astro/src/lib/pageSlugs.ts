@@ -6,6 +6,7 @@
 export const EXCLUDED_SLUGS = [
   'home-2', // version vieja de la home, ya reemplazada
   'borrega-blog', // tiene su propia pagina (listado de blog)
+  'nuestro-trabajo', // listado de proyectos a medida (lee posts de WP)
   'assist-testing-borrega', // pagina de pruebas interna, no es contenido publico
   'contacto', // pagina a medida
   'externalizacion-servicios', // landing de servicio a medida

@@ -147,3 +147,16 @@ export function postPath(post: WPPost): string {
   const dd = String(d.getDate()).padStart(2, '0');
   return `/${yyyy}/${mm}/${dd}/${post.slug}/`;
 }
+
+// ---------------------------------------------------------------------------
+// Trabajos / Proyectos ("Nuestro trabajo")
+// Los proyectos del sitio son los posts que NO pertenecen al blog (no tienen
+// la categoria "BlogPost"). Cada uno ademas ya genera su pagina de detalle en
+// /YYYY/MM/DD/slug/. Listarlos desde aca hace que se sincronicen solos con
+// WordPress en cada build: si la clienta agrega un proyecto nuevo en WP,
+// aparece sin tocar codigo.
+export async function getWorkPosts(limit?: number): Promise<WPPost[]> {
+  const [blogCategoryId, all] = await Promise.all([getBlogCategoryId(), getAllPosts()]);
+  const work = all.filter((p) => blogCategoryId == null || !p.categories.includes(blogCategoryId));
+  return typeof limit === 'number' ? work.slice(0, limit) : work;
+}
