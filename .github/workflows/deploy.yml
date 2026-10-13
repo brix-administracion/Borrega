@@ -50,3 +50,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
           local-dir: borrega-astro/dist/
+          protocol: ftps
+          port: 21
