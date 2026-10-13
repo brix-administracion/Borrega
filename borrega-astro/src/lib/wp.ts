@@ -8,8 +8,19 @@
 const WP_BASE_URL = import.meta.env.WP_BASE_URL || 'https://www.borregastudio.com';
 const API = `${WP_BASE_URL}/wp-json/wp/v2`;
 
+// Algunos hostings (incluido el de borregastudio.com) responden 403 a los
+// pedidos de /wp-json que llegan sin user-agent de navegador o desde IPs de
+// datacenter (proteccion anti-bots). Mandamos headers de navegador para que
+// el build desde CI (GitHub Actions) pueda leer la REST API igual que un
+// navegador normal.
+const WP_HEADERS: Record<string, string> = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  Accept: 'application/json',
+};
+
 async function wpFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${API}${path}`);
+  const res = await fetch(`${API}${path}`, { headers: WP_HEADERS });
   if (!res.ok) {
     throw new Error(`WP API error ${res.status} on ${path}`);
   }
@@ -69,7 +80,7 @@ async function fetchAllPages<T>(basePath: string, extraParams = ''): Promise<T[]
   let page = 1;
   let results: T[] = [];
   while (true) {
-    const res = await fetch(`${API}${basePath}?per_page=${perPage}&page=${page}${extraParams}`);
+    const res = await fetch(`${API}${basePath}?per_page=${perPage}&page=${page}${extraParams}`, { headers: WP_HEADERS });
     if (!res.ok) {
       if (res.status === 400) break; // no hay mas paginas
       throw new Error(`WP API error ${res.status} on ${basePath}`);
