@@ -10,6 +10,7 @@ node_modules/
 borrega-astro/node_modules/
 borrega-astro/dist/
 borrega-astro/.astro/
+borrega-astro/.astro-cache/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

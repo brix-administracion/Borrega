@@ -32,6 +32,17 @@ jobs:
           cache: npm
           cache-dependency-path: borrega-astro/package-lock.json
 
+      # Las imagenes remotas ya optimizadas se guardan fuera de node_modules
+      # (ver cacheDir en astro.config.mjs) para que sobrevivan al npm ci.
+      # Clave rodante: restaura la mas reciente y guarda una nueva en cada
+      # corrida, asi acompaña a las imagenes que vaya subiendo la clienta.
+      - name: Cache de imagenes optimizadas
+        uses: actions/cache@v4
+        with:
+          path: borrega-astro/.astro-cache
+          key: astro-cache-${{ github.run_id }}
+          restore-keys: astro-cache-
+
       - name: Instalar dependencias
         working-directory: borrega-astro
         run: npm ci

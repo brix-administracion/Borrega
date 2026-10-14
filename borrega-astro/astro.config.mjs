@@ -22,6 +22,11 @@ export default defineConfig({
   image: {
     domains: ['www.borregastudio.com', 'borregastudio.com'],
   },
+  // Astro cachea aca las imagenes remotas ya optimizadas. El default es
+  // ./node_modules/.astro, pero en CI `npm ci` borra node_modules entero, asi
+  // que la cache no sobrevivia y el runner volvia a bajar las imagenes de
+  // WordPress en cada build. Fuera de node_modules, el workflow la persiste.
+  cacheDir: './.astro-cache',
   // /formulario/ es una URL vieja/duplicada de WordPress que muestra el
   // mismo contenido que /sumate/ (mismo formulario, mismo texto). En vez
   // de duplicar la página, la redirigimos para no repetir contenido.
