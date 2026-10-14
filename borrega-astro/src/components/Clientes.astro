@@ -1,0 +1,59 @@
+---
+// Seccion "Nuestros Clientes": segmentacion en 3 perfiles, cada uno con su CTA.
+const segments = [
+  {
+    label: 'Corporativos & Equipos de Marketing',
+    ctaLabel: 'Pedir cotización de servicios',
+    ctaHref: '/contacto',
+  },
+  {
+    label: 'Profesionales y Servicios',
+    ctaLabel: 'Coordinar un call de evaluación',
+    ctaHref: '/reservar-consulta',
+  },
+  {
+    label: 'Agencias de Publicidad y Estudios de Comunicación',
+    ctaLabel: 'Info sobre Börrega Asist',
+    ctaHref: '/contacto',
+  },
+];
+---
+
+<section id="clientes" class="clientes">
+  <div class="container">
+    <h2 class="clientes-title" data-reveal>Nuestros Clientes</h2>
+    <ul class="clientes-grid" data-reveal>
+      {segments.map((s) => (
+        <li class="segment">
+          <h3>{s.label}</h3>
+          <a href={s.ctaHref} class="btn">{s.ctaLabel}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .clientes { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-6); }
+  .clientes-title { text-align: center; margin-bottom: var(--space-4); font-size: clamp(1.8rem, 4vw, 2.6rem); }
+  .clientes-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+  .segment {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 13rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+  .segment h3 { font-size: 1.2rem; line-height: 1.25; }
+  .segment .btn { border-color: var(--color-white); align-self: start; }
+</style>
