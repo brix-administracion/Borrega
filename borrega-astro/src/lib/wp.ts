@@ -19,8 +19,67 @@ const WP_HEADERS: Record<string, string> = {
   Accept: 'application/json',
 };
 
+// Ese mismo hosting, desde IPs de datacenter como las de GitHub Actions, a
+// veces va mas lejos y rechaza la conexion de una (ECONNREFUSED) en vez de
+// contestar un 403. Un build sin defensa se cae entero por un fallo pasajero,
+// asi que cada pedido se reintenta con esperas crecientes.
+const RETRY_DELAYS_MS = [1000, 3000, 8000, 20000];
+
+// Solo lo que puede arreglarse esperando. El 400 NO entra: fetchAllPages lo
+// usa como señal de "no hay mas paginas" y reintentarlo agregaria medio
+// minuto por coleccion. El 403 y el 404 tampoco mejoran solos.
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function describeError(error: unknown): string {
+  if (!(error instanceof Error)) return String(error);
+  const cause = error.cause;
+  if (cause instanceof Error) return `${error.message}: ${cause.message}`;
+  return error.message;
+}
+
+async function fetchWithRetry(url: string): Promise<Response> {
+  let lastReason = 'sin detalle';
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+    if (attempt > 0) await wait(RETRY_DELAYS_MS[attempt - 1]);
+    try {
+      const res = await fetch(url, { headers: WP_HEADERS });
+      if (res.ok || !RETRYABLE_STATUS.has(res.status)) return res;
+      lastReason = `HTTP ${res.status}`;
+    } catch (error) {
+      // Errores de red: ECONNREFUSED, ECONNRESET, ETIMEDOUT, EAI_AGAIN...
+      // El fetch de Node los envuelve en un "fetch failed" generico y deja el
+      // motivo real en `cause`, que es justo el dato que sirve en el log.
+      lastReason = describeError(error);
+    }
+  }
+  throw new Error(
+    `WordPress no respondio tras ${RETRY_DELAYS_MS.length + 1} intentos (${lastReason}): ${url}`,
+  );
+}
+
+// Un build de Astro corre en UN proceso y el contenido no cambia a mitad de
+// camino, asi que alcanza con guardar la promesa de cada coleccion. Sin esto
+// el build pedia /categories seis veces y /posts tres: 13 pedidos a la API
+// para cuatro endpoints distintos.
+const inFlight = new Map<string, Promise<unknown>>();
+
+function once<T>(key: string, load: () => Promise<T>): Promise<T> {
+  const cached = inFlight.get(key) as Promise<T> | undefined;
+  if (cached) return cached;
+  const pending = load().catch((error) => {
+    // Si falla se saca del mapa, para que el proximo que la necesite vuelva a
+    // intentar en vez de heredar el rechazo.
+    inFlight.delete(key);
+    throw error;
+  });
+  inFlight.set(key, pending);
+  return pending;
+}
+
 async function wpFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${API}${path}`, { headers: WP_HEADERS });
+  const res = await fetchWithRetry(`${API}${path}`);
   if (!res.ok) {
     throw new Error(`WP API error ${res.status} on ${path}`);
   }
@@ -81,7 +140,7 @@ async function fetchAllPages<T>(basePath: string, extraParams = ''): Promise<T[]
   let page = 1;
   let results: T[] = [];
   while (true) {
-    const res = await fetch(`${API}${basePath}?per_page=${perPage}&page=${page}${extraParams}`, { headers: WP_HEADERS });
+    const res = await fetchWithRetry(`${API}${basePath}?per_page=${perPage}&page=${page}${extraParams}`);
     if (!res.ok) {
       if (res.status === 400) break; // no hay mas paginas
       throw new Error(`WP API error ${res.status} on ${basePath}`);
@@ -96,7 +155,7 @@ async function fetchAllPages<T>(basePath: string, extraParams = ''): Promise<T[]
 }
 
 export function getAllPosts() {
-  return fetchAllPages<WPPost>('/posts', '&_embed=1&orderby=date&order=desc');
+  return once('posts', () => fetchAllPages<WPPost>('/posts', '&_embed=1&orderby=date&order=desc'));
 }
 
 export function getPostBySlug(slug: string) {
@@ -104,7 +163,7 @@ export function getPostBySlug(slug: string) {
 }
 
 export function getAllPages() {
-  return fetchAllPages<WPPage>('/pages');
+  return once('pages', () => fetchAllPages<WPPage>('/pages'));
 }
 
 export function getPageBySlug(slug: string) {
@@ -112,7 +171,7 @@ export function getPageBySlug(slug: string) {
 }
 
 export function getAllCategories() {
-  return wpFetch<WPCategory[]>('/categories?per_page=100');
+  return once('categories', () => wpFetch<WPCategory[]>('/categories?per_page=100'));
 }
 
 export function featuredImageOf(post: WPPost): WPMedia | undefined {
@@ -125,15 +184,29 @@ export function featuredImageOf(post: WPPost): WPMedia | undefined {
 // retina y caemos para atras si WP no genero ese size.
 const TILE_SIZE_PREFERENCE = ['medium_large', 'large', 'medium'] as const;
 
-export function tileImageOf(media: WPMedia): string {
+export interface TileImage {
+  src: string;
+  /** Faltan cuando WordPress nunca proceso la imagen (ver abajo). */
+  width?: number;
+  height?: number;
+}
+
+export function tileImageOf(media: WPMedia): TileImage {
   const sizes = media.media_details?.sizes;
   if (sizes) {
     for (const name of TILE_SIZE_PREFERENCE) {
       const size = sizes[name];
-      if (size?.source_url) return size.source_url;
+      if (size?.source_url) return { src: size.source_url, width: size.width, height: size.height };
     }
   }
-  return media.source_url;
+  // Hay featured images que WordPress nunca proceso: la de playstation-arg es
+  // un PNG de 13 MB sin miniaturas ni `media_details`, asi que de esa no
+  // sabemos ni el tamaño. Quien la use tendra que averiguarlo bajandola.
+  return {
+    src: media.source_url,
+    width: media.media_details?.width,
+    height: media.media_details?.height,
+  };
 }
 
 // El "Blog" real del sitio (borregastudio.com/borrega-blog/) NO muestra
@@ -146,7 +219,9 @@ const BLOG_CATEGORY_SLUG = 'blogpost';
 export async function getBlogPosts(): Promise<WPPost[]> {
   const blogCategoryId = await getBlogCategoryId();
   if (blogCategoryId == null) return [];
-  return fetchAllPages<WPPost>('/posts', `&_embed=1&orderby=date&order=desc&categories=${blogCategoryId}`);
+  return once(`posts:categoria:${blogCategoryId}`, () =>
+    fetchAllPages<WPPost>('/posts', `&_embed=1&orderby=date&order=desc&categories=${blogCategoryId}`),
+  );
 }
 
 export async function getBlogCategoryId(): Promise<number | null> {
