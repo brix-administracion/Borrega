@@ -1,0 +1,102 @@
+---
+// Seccion "Börrega AuditStrat / Börrega Inside" del home original, que se
+// habia omitido en la migracion. Texto y valores de diseño relevados en vivo
+// de borregastudio.com, no estimados.
+---
+
+<section class="highlights">
+  <!-- data-reveal va en el inner, NUNCA en la section: la section pinta el
+       fondo y [data-reveal] arranca en opacity 0; puesto ahi se veria el body
+       blanco hasta que corre reveal.ts (mismo bug que tuvo la banda CTA). -->
+  <div class="highlights-inner" data-reveal>
+    <article class="highlight">
+      <h2>Börrega AuditStrat</h2>
+      <p><strong>Auditoría + Estrategia en un solo proceso.</strong></p>
+      <p>
+        Antes de auditar, alineamos. Con <strong>Börrega Strata®</strong>, nuestro sistema propio,
+        ponemos en una misma mesa a todos los tomadores de decisión de la marca —y a las voces clave
+        que no lo son— para llegar a consensos claros antes de empezar.
+      </p>
+      <p>
+        Recién ahí analizamos en profundidad la comunicación, el diseño y los activos digitales de la
+        marca para detectar inconsistencias, oportunidades y puntos de mejora concretos.
+      </p>
+      <p>
+        El resultado es un diagnóstico accionable que ordena prioridades y define la estrategia y el
+        rumbo antes de ejecutar.
+      </p>
+      <a href="/auditoria-comunicacion" class="btn">MÁS INFO</a>
+    </article>
+
+    <article class="highlight">
+      <h2>Börrega Inside</h2>
+      <p>
+        No sumamos un proveedor más a tu lista de contactos: <strong>nos integramos</strong> como el
+        área <strong>creativa y estratégica de marketing y branding</strong> que hoy no tenés, sin los
+        costos ni los tiempos de armar un equipo interno full-time.
+      </p>
+      <p>
+        Participamos de la toma de decisiones, no solo de la ejecución diaria:
+        <strong>entendemos</strong> tu negocio, tu mercado y tus objetivos internos, y
+        <strong>actuamos</strong> con la misma velocidad y criterio que un equipo propio, pero con la
+        <strong>experiencia senior</strong> de haber resuelto esto antes para otras marcas.
+      </p>
+      <p>
+        El resultado es <strong>previsibilidad de costos</strong> con un fee mensual o anual,
+        <strong>continuidad de criterio</strong> en el tiempo, y un socio que cuida tu comunicación
+        con el mismo <strong>compromiso</strong> que si fuera la suya.
+      </p>
+      <a href="/externalizacion-servicios" class="btn">MÁS INFO</a>
+    </article>
+  </div>
+</section>
+
+<style>
+  /* El violeta de esta banda NO es --color-secondary suelto: en el original es
+     #792FFF con un ::before de --color-primary (#1B1B1B) al 50% de opacidad
+     encima. La mezcla da exactamente rgb(74, 37, 141). Lo dejamos resuelto como
+     color plano en vez de replicar el overlay, que no aporta nada: nada lo
+     anima ni lo destapa. */
+  .highlights {
+    background: #4a258d;
+    color: var(--color-white);
+    padding-block: var(--space-5);
+  }
+  .highlights-inner {
+    /* El inner del original mide 1140px, mas angosto que el --container-max
+       del resto del sitio; lo respetamos para conservar el largo de linea. */
+    max-width: 1140px;
+    margin-inline: auto;
+    padding-inline: var(--space-3);
+    display: grid;
+    gap: var(--space-4);
+  }
+  /* Cada columna reparte sus bloques con gap, igual que el original: los <p>
+     no llevan margin propio. */
+  .highlight {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+  }
+  .highlight h2 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.1;
+    margin: 0;
+  }
+  .highlight p {
+    margin: 0;
+    line-height: 1.5;
+  }
+  .highlight strong { font-weight: 700; }
+  .highlight .btn { margin-top: var(--space-1); }
+
+  @media (max-width: 640px) {
+    .highlights-inner { padding-inline: var(--space-2); }
+  }
+  @media (min-width: 900px) {
+    .highlights-inner {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

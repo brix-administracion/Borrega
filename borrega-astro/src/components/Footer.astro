@@ -1,9 +1,10 @@
----
-const year = new Date().getFullYear();
----
 
-<section class="cta-band" data-reveal>
-  <div class="cta-band-inner container">
+<!-- data-reveal va en el inner, NUNCA en la section: la section es la que pinta
+     el fondo negro, y [data-reveal] arranca en opacity 0. Puesto ahi, hasta que
+     reveal.ts agregaba .is-visible se veia el body (blanco) por detras. El fondo
+     tiene que quedar fuera de la animacion; solo entra el contenido. -->
+<section class="cta-band">
+  <div class="cta-band-inner container" data-reveal>
     <div class="squares squares-left" aria-hidden="true">
       {Array.from({length: 8}).map(() => <span class="sq sq-purple"></span>)}
     </div>
@@ -31,13 +32,22 @@ const year = new Date().getFullYear();
 </script>
 
 <footer class="site-footer">
-  <div class="container footer-inner">
-    <span class="footer-logo">börrega</span>
+  <div class="footer-inner">
+    <!-- El logotipo de marca es una imagen, no texto: la "börrega" del original
+         no es Playfair sino la sans redondeada del logo. Este asset ya estaba en
+         el repo desde la migracion, sin usar, y mide lo mismo que el del sitio. -->
+    <img src="/images/brand/logo-white.png" alt="Börrega Studio" width="261" height="73" class="footer-logo" />
     <p class="footer-contact">
-      BUENOS AIRES · <a href="mailto:info@borregastudio.com">INFO@BORREGASTUDIO.COM</a> · <a href="tel:+5491171327309">+54 9 11 7132-7309</a>
+      BUENOS AIRES | <a href="mailto:info@borregastudio.com">INFO@BORREGASTUDIO.COM</a> |
+      <!-- En el original el telefono es texto plano. Lo dejamos como tel: porque
+           sin subrayado y del mismo color se ve identico, y mantiene el tap-to-llamar. -->
+      <a href="tel:+5491171327309">+54 9 11 71327309</a>
     </p>
-    <p class="footer-legal">© {year} Börrega Studio. Todos los derechos reservados. <a href="/politicas-de-privacidad">Políticas de privacidad</a></p>
   </div>
+  <!-- El original no tiene linea legal (su unico link a privacidad vive en el
+       banner de cookies, que este sitio estatico no tiene). Dejamos un link
+       discreto para que /politicas-de-privacidad no quede huerfana. -->
+  <p class="footer-legal"><a href="/politicas-de-privacidad">Políticas de privacidad</a></p>
 </footer>
 
 <style>
@@ -85,29 +95,50 @@ const year = new Date().getFullYear();
     .sq-orange { background: var(--color-orange); }
   }
 
+  /* Violeta medido del footer original. Difiere apenas de --color-secondary
+     (#792FFF): el sitio original usa los dos tonos en distintas secciones. */
   .site-footer {
-    background: var(--color-secondary);
+    background: #8328ff;
     color: var(--color-white);
     padding-block: var(--space-4);
   }
   .footer-inner {
+    /* 1140px es el inner del original, mas angosto que --container-max. */
+    max-width: 1140px;
+    margin-inline: auto;
+    padding-inline: var(--space-3);
     display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
   }
   .footer-logo {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 2rem;
+    width: 261px;
+    max-width: 100%;
+    height: auto;
   }
-  .footer-contact a { text-decoration: underline; }
-  .footer-legal { font-size: 0.8rem; opacity: 0.85; }
+  .footer-contact {
+    margin: 0;
+    font-weight: 700;
+  }
+  /* Sin subrayado: en el original los links del contacto no se distinguen
+     visualmente del resto de la linea. */
+  .footer-contact a { text-decoration: none; color: inherit; }
+  .footer-legal {
+    margin: var(--space-2) 0 0;
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
   .footer-legal a { text-decoration: underline; }
+
+  @media (max-width: 700px) {
+    .footer-inner { flex-direction: column; gap: var(--space-2); }
+    .footer-contact { text-align: center; }
+  }
 
   @media (min-width: 700px) {
     .cta-band-inner { grid-template-columns: 1fr 1fr; }
-  }
-  @media (min-width: 900px) {
-    .footer-inner { flex-direction: row; align-items: center; justify-content: space-between; }
   }
 </style>

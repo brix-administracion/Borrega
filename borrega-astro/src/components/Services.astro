@@ -37,11 +37,22 @@ const services = [
         gusta hacerlo bien.
       </p>
     </div>
-    <ul class="services-cloud" data-reveal>
-      {services.map((s) => (
-        <li class:list={['tag', `tag-${s.color}`]}>{s.label}</li>
-      ))}
-    </ul>
+    <div
+      class="services-fall"
+      data-falling-tags
+      data-reveal
+      data-stagger="0.04"
+      data-order="sequence"
+      data-gravity="1"
+      data-bounciness="0.15"
+      data-restore-delay="2.5"
+    >
+      <ul class="services-cloud">
+        {services.map((s) => (
+          <li class:list={['tag', `tag-${s.color}`]} data-piece>{s.label}</li>
+        ))}
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -73,6 +84,11 @@ const services = [
      del default del navegador. */
   .services-intro p { margin: 0 0 var(--space-2); }
   .services-intro p:last-child { margin-bottom: 0; }
+  /* Contenedor fisico de FallingTags: position explicito porque las piezas
+     se anclan a el con position:absolute (no depender del transform del
+     reveal). El padding-bottom es el espacio de caida: el piso de la
+     simulacion queda al final del padding-box. */
+  .services-fall { position: relative; padding-bottom: 140px; }
   .services-cloud {
     list-style: none;
     margin: 0;
@@ -96,3 +112,8 @@ const services = [
   .tag-pink { background: var(--color-pink); color: var(--color-primary); border-color: var(--color-pink); }
   .tag-orange { background: var(--color-orange); color: var(--color-white); border-color: var(--color-orange); }
 </style>
+
+<script>
+  import { initFallingTags } from '../scripts/fallingTags';
+  initFallingTags();
+</script>
