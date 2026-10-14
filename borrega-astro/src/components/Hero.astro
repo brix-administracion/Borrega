@@ -1,52 +1,73 @@
 ---
-// Hero del home. Reconstruido segun el sitio actual (borregastudio.com):
-// titular "top of mind", intro de la agencia, y marquee de logos de clientes.
+import { getImage } from 'astro:assets';
+import slide1Desktop from '../assets/images/hero/slide-1.png';
+import slide2Desktop from '../assets/images/hero/slide-2.png';
+import slide3Desktop from '../assets/images/hero/slide-3.png';
+import slide1Mobile from '../assets/images/hero/slide-1-mobile.png';
+import slide2Mobile from '../assets/images/hero/slide-2-mobile.png';
+import slide3Mobile from '../assets/images/hero/slide-3-mobile.png';
+
 const clients = [
-  { name: 'Telecentro', logo: '/images/logos/telecentro.png' },
-  { name: 'Roemmers', logo: '/images/logos/roemmers.svg' },
-  { name: 'Galicia', logo: '/images/logos/galicia.svg' },
-  { name: 'Megatlon', logo: '/images/logos/megatlon.svg' },
+  { name: 'CINQ', logo: '/images/logos/cinq.svg' },
   { name: 'DOT Hotels', logo: '/images/logos/dot.svg' },
-  { name: 'Sofía Clerici', logo: '/images/logos/sofia-clerici.svg' },
+  { name: 'Fábrica de Invitaciones', logo: '/images/logos/fabrica-invitaciones.svg' },
+  { name: 'Five', logo: '/images/logos/five.svg' },
+  { name: 'Galicia', logo: '/images/logos/galicia.svg' },
+  { name: 'Jason.l', logo: '/images/logos/jason.svg' },
+  { name: 'Megatlon', logo: '/images/logos/megatlon.svg' },
   { name: 'Perpetuo', logo: '/images/logos/perpetuo.svg' },
+  { name: 'Roemmers', logo: '/images/logos/roemmers.svg' },
+  { name: 'Sofía Clerici', logo: '/images/logos/sofia-clerici.svg' },
   { name: 'Sparty', logo: '/images/logos/sparty.svg' },
   { name: 'Sonoff', logo: '/images/logos/sonoff.svg' },
   { name: 'Uplifting', logo: '/images/logos/uplifting.svg' },
-  { name: 'Five', logo: '/images/logos/five.svg' },
-  { name: 'Jason.l', logo: '/images/logos/jason.svg' },
-  { name: 'CINQ', logo: '/images/logos/cinq.svg' },
   { name: 'Campanita', logo: '/images/logos/campanita.svg' },
-  { name: 'Fábrica de Invitaciones', logo: '/images/logos/fabrica-invitaciones.svg' },
-  { name: 'Osba', logo: '/images/logos/osba.png' },
-  { name: 'Nutribaby', logo: '/images/logos/nutribaby.png' },
 ];
+
+// Las 3 slides del hero son arte pre-compuesto (texto + ilustracion en un
+// solo PNG), tal como estan armadas hoy en Elementor -> Ooohboi Steroids.
+// El sitio original ademas sirve una composicion mas angosta para
+// pantallas chicas (mismos textos e iconos, recompuestos en un lienzo mas
+// cuadrado) en vez de estirar/recortar la version de escritorio. Migramos
+// ese mismo criterio con <picture> + media query (art direction).
+const slidesData = [
+  { desktop: slide1Desktop, mobile: slide1Mobile, alt: 'Una llave en mano que resuelve la comunicación de manera estratégica.' },
+  { desktop: slide2Desktop, mobile: slide2Mobile, alt: 'Un estudio donde la experiencia se fusiona con la innovación.' },
+  { desktop: slide3Desktop, mobile: slide3Mobile, alt: 'Definimos, creamos, potenciamos. Marcas y empresas con visión.' },
+];
+
+const slides = await Promise.all(
+  slidesData.map(async (s) => ({
+    alt: s.alt,
+    desktop: await getImage({ src: s.desktop, width: 1920, height: 781 }),
+    mobile: await getImage({ src: s.mobile, width: 1210, height: 781 }),
+  }))
+);
 ---
 
-<section class="hero" id="top">
-  <div class="container hero-content">
-    <h1 data-reveal>
-      Llevamos a las marcas a ser <span class="hl">top of mind</span> de su cliente ideal.
-    </h1>
-    <p class="hero-lead" data-reveal>
-      Somos Börrega, una agencia creativa de marketing y branding estratégico que transforma
-      necesidades en resultados.
-    </p>
-    <p class="hero-text" data-reveal>
-      Con base en Buenos Aires y un equipo senior, boutique y multidisciplinario, brindamos
-      estrategia y ejecución desde el mismo lugar, sin intermediarios. Acompañamos marcas bajo
-      modalidad fee mensual (Börrega Inside) o por proyecto, adaptándonos a cada etapa del negocio.
-    </p>
-    <p class="hero-rebano" data-reveal>
-      <strong>No seguimos al rebaño:</strong> pensamos distinto, actuamos con precisión y nos
-      gusta hacerlo bien.
-    </p>
-    <div class="hero-ctas" data-reveal>
-      <a href="/contacto" class="btn btn-accent">CONSULTORÍA GRATIS</a>
-      <a href="/#trabajo" class="btn">NUESTRO TRABAJO</a>
+<section class="hero">
+  <div class="hero-slider" data-hero-slider aria-roledescription="carousel" aria-label="Börrega Studio">
+    <div class="hero-track" data-hero-track>
+      {slides.map((s, i) => (
+        <div class="hero-slide" role="group" aria-roledescription="slide" aria-label={`${i + 1} de ${slides.length}`}>
+          <picture>
+            <source media="(max-width: 900px)" srcset={s.mobile.src} width="1210" height="781" />
+            <img
+              src={s.desktop.src}
+              alt={s.alt}
+              width="1920"
+              height="781"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : 'auto'}
+              decoding={i === 0 ? 'sync' : 'async'}
+            />
+          </picture>
+        </div>
+      ))}
     </div>
   </div>
 
-  <div class="marquee" aria-hidden="true">
+  <div class="marquee">
     <div class="marquee-track">
       {[...clients, ...clients].map((c) => (
         <span class="marquee-item">
@@ -59,51 +80,40 @@ const clients = [
 
 <style>
   .hero {
-    position: relative;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 60% 55% at 25% 15%, rgba(121, 47, 255, 0.45), transparent 60%),
-      radial-gradient(ellipse 55% 50% at 80% 10%, rgba(247, 105, 48, 0.3), transparent 60%),
-      var(--color-bg);
+    background: var(--color-bg);
     color: var(--color-white);
   }
-  .hero-content {
-    padding-block: clamp(3rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+  .hero-slider {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1920 / 781;
   }
-  .hero h1 {
-    font-size: clamp(2.1rem, 6vw, 4rem);
-    max-width: 20ch;
+  @media (max-width: 900px) {
+    .hero-slider { aspect-ratio: 1210 / 781; }
   }
-  .hero .hl { color: var(--color-accent); font-style: italic; }
-  .hero-lead {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-    font-weight: 600;
-    max-width: 48ch;
-    margin-top: var(--space-2);
-  }
-  .hero-text,
-  .hero-rebano {
-    max-width: 62ch;
-    opacity: 0.85;
-    margin-top: var(--space-2);
-  }
-  .hero-rebano strong { color: var(--color-white); opacity: 1; }
-  .hero-ctas {
+  .hero-track {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-4);
+    width: 100%;
+    height: 100%;
+    transition: transform 1s var(--ease-out);
   }
-  .btn-accent {
-    background: var(--color-accent);
-    color: var(--color-primary);
-    border-color: var(--color-accent);
+  .hero-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
   }
-  .btn-accent:hover { background: transparent; color: var(--color-white); border-color: var(--color-white); }
+  .hero-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-track { transition: none; }
+  }
 
   .marquee {
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--color-secondary);
     overflow: hidden;
     padding-block: var(--space-3);
   }
@@ -112,21 +122,45 @@ const clients = [
     width: max-content;
     gap: var(--space-5);
     align-items: center;
-    animation: hero-marquee 45s linear infinite;
+    animation: scroll-marquee 32s linear infinite;
   }
-  .marquee-item { display: flex; align-items: center; height: 34px; }
+  .marquee-item { display: flex; align-items: center; height: 32px; }
   .marquee-item img {
     height: 100%;
     width: auto;
     object-fit: contain;
     filter: brightness(0) invert(1);
-    opacity: 0.85;
+    opacity: 0.9;
   }
-  @keyframes hero-marquee {
+  @keyframes scroll-marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .marquee-track { animation: none; flex-wrap: wrap; }
+    .marquee-track { animation: none; }
   }
 </style>
+
+<script>
+  // Reproduce el comportamiento real del carousel de Elementor en el Hero:
+  // autoplay cada 5s, transicion tipo "slide" de 1s, loop infinito, sin
+  // flechas ni bullets (asi esta configurado el widget original).
+  const AUTOPLAY_DELAY = 5000;
+
+  document.querySelectorAll<HTMLElement>('[data-hero-slider]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-hero-track]');
+    const slides = root.querySelectorAll<HTMLElement>('.hero-slide');
+    if (!track || slides.length < 2) return;
+
+    let index = 0;
+    const goTo = (i: number) => {
+      index = (i + slides.length) % slides.length;
+      track.style.transform = `translateX(-${index * 100}%)`;
+    };
+
+    let timer = window.setInterval(() => goTo(index + 1), AUTOPLAY_DELAY);
+
+    // Pausa el autoplay si el usuario interactua (igual que "pause_on_interaction")
+    root.addEventListener('pointerdown', () => window.clearInterval(timer));
+  });
+</script>

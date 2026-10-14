@@ -3,56 +3,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Services from '../components/Services.astro';
 import About from '../components/About.astro';
-import ServiceTeaser from '../components/ServiceTeaser.astro';
-import Testimonials from '../components/Testimonials.astro';
 import Portfolio from '../components/Portfolio.astro';
-import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
-import Clientes from '../components/Clientes.astro';
+import Testimonials from '../components/Testimonials.astro';
 ---
 
-<BaseLayout title="Börrega Studio — Agencia creativa de marketing y branding estratégico">
+<BaseLayout title="Börrega Studio — Diseño, estrategia y creatividad">
   <Hero />
   <Services />
   <About />
-
-  <ServiceTeaser
-    title="Börrega AuditStrat"
-    subtitle="Auditoría + Estrategia en un solo proceso."
-    bodyHtml="Antes de auditar, alineamos a los tomadores de decisión y a las voces clave con nuestro sistema propio, <strong>Börrega Strata®</strong>, para construir consensos. Después analizamos comunicación, diseño y activos digitales para detectar inconsistencias y oportunidades. El resultado es un diagnóstico accionable que define prioridades y rumbo antes de ejecutar."
-    ctaLabel="MÁS INFO"
-    ctaHref="/auditoria-comunicacion"
-    accent="violet"
-  />
-
-  <ServiceTeaser
-    title="Börrega Inside"
-    subtitle="Tu área creativa y estratégica, sin un equipo interno full-time."
-    bodyHtml="Nos integramos como el área creativa y estratégica de marketing y branding que hoy no tenés, sin los costos ni los tiempos de un equipo interno full-time. Participamos en la <strong>toma de decisiones</strong>, no solo en la ejecución, con previsibilidad de costos, continuidad de criterio y compromiso real."
-    ctaLabel="MÁS INFO"
-    ctaHref="/externalizacion-servicios"
-    accent="orange"
-  />
-
-  <Testimonials />
   <Portfolio />
-
-  <ServiceFinalCTA
-    titleHtml="Estamos para <span class='hl'>ayudar</span>"
-    text="Contactanos, contanos qué necesitás. Trabajemos juntos."
-    ctaLabel="ESCRIBINOS"
-    ctaHref="/contacto"
-  />
-
-  <ServiceFinalCTA
-    titleHtml="¿Querés sumarte al <span class='hl'>rebaño</span>?"
-    text="Si tenés ganas, si creés que tenés algo para aportar o si querés tirar el lance, escribinos."
-    ctaLabel="POSTULATE"
-    ctaHref="/sumate"
-  />
-
-  <Clientes />
+  <Testimonials />
 </BaseLayout>
-
-<style>
-  :global(.hl) { color: var(--color-accent); }
-</style>
