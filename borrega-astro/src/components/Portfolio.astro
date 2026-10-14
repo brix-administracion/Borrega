@@ -1,89 +1,63 @@
 ---
-import { getWorkPosts, featuredImageOf, postPath } from '../lib/wp';
+import DomeGallery from './DomeGallery.astro';
+import { getWorkPosts, getCountryCategories, countryOf, featuredImageOf, tileImageOf, postPath } from '../lib/wp';
 
-// "Nuestro trabajo": los 9 proyectos mas recientes, leidos en vivo de
-// WordPress en cada build (posts que NO pertenecen al blog). Si la clienta
-// agrega un proyecto nuevo en WP, aparece solo al reconstruir — ya no hay
-// imagenes hardcodeadas aca.
-const works = await getWorkPosts(9);
+// "Nuestro trabajo": TODOS los proyectos, leidos en vivo de WordPress en cada
+// build (los posts que NO pertenecen al blog). Si la clienta agrega o borra un
+// proyecto en WP, el domo se ajusta solo al reconstruir — no hay nada
+// hardcodeado aca, ni la cantidad.
+const [works, countries] = await Promise.all([getWorkPosts(), getCountryCategories()]);
+
+const items = works.flatMap((post) => {
+  const img = featuredImageOf(post);
+  // Sin featured image no hay tile posible; el proyecto igual tiene su pagina
+  // de detalle, solo no entra al domo.
+  if (!img) return [];
+  const label = post.title.rendered.replace(/<[^>]+>/g, '');
+  return [
+    {
+      src: tileImageOf(img),
+      alt: img.alt_text || label,
+      titleHtml: post.title.rendered,
+      label,
+      href: postPath(post),
+      country: countryOf(post, countries),
+    },
+  ];
+});
 ---
 
 <section id="trabajo" class="portfolio">
   <div class="container">
     <h2 class="portfolio-title" data-reveal>Nuestro trabajo</h2>
-    <ul class="portfolio-grid" data-reveal>
-      {works.map((post) => {
-        const img = featuredImageOf(post);
-        const plainTitle = post.title.rendered.replace(/<[^>]+>/g, '');
-        return (
-          <li class="portfolio-item">
-            <a href={postPath(post)} class="portfolio-link" aria-label={plainTitle}>
-              {img ? (
-                <img src={img.source_url} alt={img.alt_text || plainTitle} loading="lazy" width="520" height="520" />
-              ) : (
-                <span class="portfolio-noimg">{plainTitle}</span>
-              )}
-              <span class="portfolio-caption" set:html={post.title.rendered} />
-            </a>
-          </li>
-        );
-      })}
-    </ul>
-    <a href="/nuestro-trabajo" class="portfolio-more">VER MÁS</a>
+  </div>
+
+  <!-- El domo va a sangre y SIN data-reveal: pinta su propio fondo (igual que
+       el Footer y ServiceHighlights) y ademas necesita medir su tamaño real al
+       cargar para calcular el radio. -->
+  <div class="portfolio-dome">
+    <DomeGallery items={items} />
+  </div>
+
+  <div class="container">
+    <a href="/nuestro-trabajo" class="portfolio-more" data-reveal>VER MÁS</a>
   </div>
 </section>
 
 <style>
-  .portfolio { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-6); }
-  .portfolio-title { text-align: center; margin-bottom: var(--space-4); }
-  .portfolio-grid {
-    list-style: none;
-    margin: 0 0 var(--space-4);
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-2);
-  }
-  .portfolio-item {
-    overflow: hidden;
-    border-radius: 12px;
-    aspect-ratio: 1 / 1;
-  }
-  .portfolio-link {
-    position: relative;
-    display: block;
-    width: 100%;
-    height: 100%;
+  .portfolio {
+    background: var(--color-bg);
     color: var(--color-white);
+    padding-block: var(--space-6);
   }
-  .portfolio-link img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s var(--ease-out);
-  }
-  .portfolio-item:hover .portfolio-link img { transform: scale(1.06); }
-  .portfolio-noimg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: var(--space-2);
+  .portfolio-title {
     text-align: center;
-    background: var(--color-secondary);
+    margin-bottom: var(--space-4);
   }
-  .portfolio-caption {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: var(--space-3) var(--space-2) var(--space-2);
-    font-weight: 700;
-    font-size: 0.95rem;
-    line-height: 1.2;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  .portfolio-dome {
+    position: relative;
+    height: clamp(420px, 70vh, 760px);
+    margin-bottom: var(--space-4);
   }
   .portfolio-more {
     display: block;
@@ -92,9 +66,5 @@ const works = await getWorkPosts(9);
     letter-spacing: 0.04em;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     padding-top: var(--space-3);
-  }
-
-  @media (min-width: 700px) {
-    .portfolio-grid { grid-template-columns: repeat(3, 1fr); }
   }
 </style>
