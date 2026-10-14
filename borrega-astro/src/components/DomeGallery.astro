@@ -1,0 +1,388 @@
+---
+import { Image } from 'astro:assets';
+import type { WPCountry } from '../lib/wp';
+
+// Domo 3D de imagenes (port del concepto DomeGallery de React Bits, sin
+// React). Diferencias clave con el original:
+//
+// 1. Cada tile es un <a> a su proyecto, no un boton que abre un lightbox.
+//    Eso deja afuera toda la maquinaria de "enlarge" del original (viewer,
+//    scrim, frame, scroll-lock) y obliga a lo contrario: suprimir el click
+//    cuando el gesto fue un arrastre, si no girar el domo navega.
+// 2. La grilla de tiles se calcula ACA, en el build, no en el cliente: los
+//    100 <a href> salen en el HTML estatico y los lee un crawler.
+// 3. El tile muestra titulo + bandera + pais al hacer hover.
+//
+// La configuracion para el script viaja por data-* en la raiz (el <script>
+// de Astro se bundlea aparte y no ve este frontmatter).
+
+export interface DomeItem {
+  src: string;
+  alt: string;
+  /** title.rendered de WP: puede traer entidades HTML, va con set:html. */
+  titleHtml: string;
+  /** Titulo plano, para aria-label. */
+  label: string;
+  href: string;
+  country?: WPCountry;
+}
+
+interface Props {
+  items: DomeItem[];
+  segments?: number;
+  segmentsY?: number;
+  fit?: number;
+  fitBasis?: 'auto' | 'min' | 'max' | 'width' | 'height';
+  minRadius?: number;
+  maxRadius?: number;
+  overlayBlurColor?: string;
+  maxVerticalRotationDeg?: number;
+  dragSensitivity?: number;
+  dragDampening?: number;
+  imageBorderRadius?: string;
+  grayscale?: boolean;
+}
+
+const {
+  items,
+  segments = 26,
+  // El eje vertical va mas denso que el horizontal a proposito: junta las
+  // filas (el domo desborda menos el alto del contenedor) y deja el tile
+  // apaisado en ~1.35, mucho mas cerca del 1.5 de las fotos de WordPress que
+  // un tile cuadrado, asi que el object-fit recorta bastante menos.
+  segmentsY = 30,
+  fit = 0.66,
+  fitBasis = 'auto',
+  minRadius = 560,
+  maxRadius = Infinity,
+  overlayBlurColor = '#000000',
+  maxVerticalRotationDeg = 5,
+  dragSensitivity = 20,
+  dragDampening = 2,
+  imageBorderRadius = '12px',
+  grayscale = false,
+} = Astro.props;
+
+// Columnas en anillo y filas alternadas: asi los tiles quedan trabados en
+// panal en vez de alineados en una cuadricula, que es lo que hace que el
+// domo se lea como una superficie y no como una grilla curvada.
+// Las imagenes se optimizan en el build con astro:assets (el dominio de WP ya
+// esta habilitado en image.domains). No alcanza con pedirle a WordPress un
+// size chico: hay proyectos cuya featured image nunca se proceso y WP solo
+// tiene el original — el de playstation-arg pesa 13 MB. Pasa width sin height
+// a proposito: la altura sale del aspecto real de cada imagen y el recorte
+// cuadrado lo hace el object-fit del tile.
+const TILE_PX = 420;
+
+// Cuatro filas y no cinco: con cinco el domo abarca +/-40 grados verticales y
+// se desborda un 46% del alto del contenedor, asi que las filas de los
+// extremos quedan siempre recortadas. Simetricas respecto del centro.
+const EVEN_YS = [-3, -1, 1, 3];
+const ODD_YS = [-2, 0, 2, 4];
+
+// Los slots se recorren POR FILA, no por columna, y cada fila arranca unas
+// columnas mas alla. El orden importa porque el reparto de abajo es lineal:
+// recorriendo por columna, la fila de un slot quedaba determinada por su
+// indice (con 5 filas y 20 proyectos, 5 divide a 20 y cada proyecto caia
+// siempre en la misma fila; los que tocaban la de abajo no se veian nunca).
+// La rotacion por fila, ademas, separa las copias de un mismo proyecto: con
+// 3 quedan a 3 columnas minimo (con 7 caian a 1, practicamente pegadas) sin
+// perder el reparto en las 4 filas.
+const COLUMN_SHIFT = 3;
+
+const slots = EVEN_YS.flatMap((_, row) =>
+  Array.from({ length: segments }, (__, position) => {
+    const col = (position + row * COLUMN_SHIFT) % segments;
+    const ys = col % 2 === 0 ? EVEN_YS : ODD_YS;
+    return { x: -37 + col * 2, y: ys[row], sizeX: 2, sizeY: 2 };
+  }),
+);
+
+// Reparto ciclico: el modulo garantiza que NINGUN proyecto quede afuera aunque
+// haya menos proyectos que slots. Como el indice avanza de a uno, dos slots
+// consecutivos nunca pueden ser el mismo proyecto: no hace falta desarmar
+// vecinos repetidos.
+const assigned: DomeItem[] = slots.map((_, i) => items[i % items.length]);
+
+// Un proyecto repetido 5 veces serian 5 paradas de tabulacion al mismo sitio.
+// Solo la primera aparicion es navegable por teclado y visible para lectores
+// de pantalla; las copias quedan como superficie clickeable con el mouse.
+const primaryHrefs = new Set<string>();
+const tiles = slots.map((slot, i) => {
+  const item = assigned[i];
+  const primary = !primaryHrefs.has(item.href);
+  if (primary) primaryHrefs.add(item.href);
+  return { ...slot, item, primary };
+});
+---
+
+{items.length > 0 && (
+  <div
+    class="dome"
+    data-dome-gallery
+    data-fit={fit}
+    data-fit-basis={fitBasis}
+    data-min-radius={minRadius}
+    data-max-radius={maxRadius}
+    data-overlay-blur-color={overlayBlurColor}
+    data-max-vertical-rotation={maxVerticalRotationDeg}
+    data-drag-sensitivity={dragSensitivity}
+    data-drag-dampening={dragDampening}
+    data-tile-radius={imageBorderRadius}
+    data-grayscale={String(grayscale)}
+    style={`--segments-x:${segments};--segments-y:${segmentsY};--overlay-blur-color:${overlayBlurColor};--tile-radius:${imageBorderRadius};--image-filter:${grayscale ? 'grayscale(1)' : 'none'}`}
+  >
+    <div class="dome__main" data-dome-main>
+      <div class="dome__stage">
+        <div class="dome__sphere" data-dome-sphere>
+          {tiles.map((tile) => (
+            <div
+              class="dome__item"
+              style={`--offset-x:${tile.x};--offset-y:${tile.y};--item-size-x:${tile.sizeX};--item-size-y:${tile.sizeY}`}
+            >
+              <a
+                class="dome__link"
+                href={tile.item.href}
+                aria-label={tile.primary ? tile.item.label : undefined}
+                tabindex={tile.primary ? undefined : '-1'}
+                aria-hidden={tile.primary ? undefined : 'true'}
+              >
+                <Image
+                  src={tile.item.src}
+                  inferSize
+                  width={TILE_PX}
+                  alt={tile.primary ? tile.item.alt : ''}
+                  format="webp"
+                  quality={72}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                />
+                <span class="dome__caption">
+                  <span class="dome__name" set:html={tile.item.titleHtml} />
+                  {tile.item.country && (
+                    <span class="dome__country">
+                      <img src={`/flags/${tile.item.country.iso}.svg`} width="18" height="12" alt="" />
+                      {tile.item.country.name}
+                    </span>
+                  )}
+                </span>
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="dome__overlay"></div>
+      <div class="dome__overlay dome__overlay--blur"></div>
+      <div class="dome__fade dome__fade--top"></div>
+      <div class="dome__fade dome__fade--bottom"></div>
+    </div>
+  </div>
+)}
+
+<style>
+  .dome {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* --radius lo reescribe el script segun el tamaño real del contenedor;
+       este valor es el que usa el domo si JS no corre. */
+    --radius: 520px;
+    --circ: calc(var(--radius) * 3.14);
+    --rot-y: calc((360deg / var(--segments-x)) / 2);
+    --rot-x: calc((360deg / var(--segments-y)) / 2);
+    --item-width: calc(var(--circ) / var(--segments-x));
+    --item-height: calc(var(--circ) / var(--segments-y));
+  }
+  .dome :global(*) {
+    box-sizing: border-box;
+  }
+
+  .dome__main {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    /* pan-y y NO none (como el original): el domo vive en medio del home, el
+       scroll vertical de la pagina tiene que seguir siendo del navegador. El
+       drag horizontal, que es el eje que mueve el domo, lo tomamos nosotros. */
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    background: var(--overlay-blur-color, #000);
+    cursor: grab;
+  }
+  .dome__main[data-dragging='true'] {
+    cursor: grabbing;
+  }
+
+  .dome__stage {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    perspective: calc(var(--radius) * 2);
+    perspective-origin: 50% 50%;
+    contain: layout paint size;
+  }
+
+  .dome__sphere {
+    transform: translateZ(calc(var(--radius) * -1));
+    will-change: transform;
+  }
+  .dome__sphere,
+  .dome__item,
+  .dome__link {
+    transform-style: preserve-3d;
+  }
+
+  .dome__item {
+    position: absolute;
+    inset: -999px;
+    margin: auto;
+    width: calc(var(--item-width) * var(--item-size-x));
+    height: calc(var(--item-height) * var(--item-size-y));
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+    transform: rotateY(calc(var(--rot-y) * (var(--offset-x) + ((var(--item-size-x) - 1) / 2))))
+      rotateX(calc(var(--rot-x) * (var(--offset-y) - ((var(--item-size-y) - 1) / 2))))
+      translateZ(var(--radius));
+  }
+
+  .dome__link {
+    position: absolute;
+    inset: 10px;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--tile-radius, 12px);
+    background: var(--overlay-blur-color, #000);
+    color: var(--color-white);
+    backface-visibility: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transform: translateZ(0);
+  }
+  .dome__link > img {
+    /* astro:assets emite un <img> plano, sigue siendo hijo directo del <a>. */
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    backface-visibility: hidden;
+    filter: var(--image-filter, none);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .dome__link:hover > img,
+  .dome__link:focus-visible > img {
+    transform: scale(1.06);
+  }
+  .dome__link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .dome__caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    padding: var(--space-3) 0.6rem 0.5rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0));
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out);
+    pointer-events: none;
+  }
+  .dome__link:hover .dome__caption,
+  .dome__link:focus-visible .dome__caption {
+    opacity: 1;
+  }
+  .dome__name {
+    font-weight: 700;
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+  .dome__country {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .dome__country img {
+    display: block;
+    width: 18px;
+    height: 12px;
+    border-radius: 1px;
+    flex: none;
+  }
+
+  .dome__overlay,
+  .dome__fade {
+    position: absolute;
+    pointer-events: none;
+  }
+  .dome__overlay {
+    inset: 0;
+    z-index: 3;
+    background-image: radial-gradient(rgba(235, 235, 235, 0) 65%, var(--overlay-blur-color, #000) 100%);
+  }
+  .dome__overlay--blur {
+    background-image: none;
+    -webkit-mask-image: radial-gradient(rgba(0, 0, 0, 0) 70%, #000 90%);
+    mask-image: radial-gradient(rgba(0, 0, 0, 0) 70%, #000 90%);
+    backdrop-filter: blur(3px);
+  }
+  .dome__fade {
+    left: 0;
+    right: 0;
+    height: 120px;
+    z-index: 5;
+  }
+  .dome__fade--top {
+    top: 0;
+    background: linear-gradient(to top, transparent, var(--overlay-blur-color, #000));
+  }
+  .dome__fade--bottom {
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent, var(--overlay-blur-color, #000));
+  }
+
+  @media (hover: none) {
+    .dome__caption {
+      opacity: 1;
+      padding: var(--space-2) 0.45rem 0.4rem;
+    }
+    .dome__name {
+      font-size: 0.62rem;
+    }
+    .dome__country {
+      font-size: 0.54rem;
+    }
+    .dome__country img {
+      width: 14px;
+      height: 10px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dome__caption,
+    .dome__link > img {
+    /* astro:assets emite un <img> plano, sigue siendo hijo directo del <a>. */
+      transition: none;
+    }
+    .dome__link:hover > img,
+    .dome__link:focus-visible > img {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { initDomeGallery } from '../scripts/domeGallery';
+  initDomeGallery();
+</script>
