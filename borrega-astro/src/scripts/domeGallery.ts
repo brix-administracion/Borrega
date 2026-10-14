@@ -16,6 +16,11 @@
 const MOVE_THRESHOLD_SQ = 16; // (4px)^2: por debajo es un tap, no un arrastre
 const CLICK_GUARD_MS = 80; // margen despues de soltar, por si el click llega tarde
 const MAX_INERTIA_V = 1.4;
+// Techo del radio en funcion del alto del contenedor. El original usa 1.35,
+// pensado para un viewport a pantalla completa; en una seccion ancha y baja
+// ese tope aprieta antes que `fit` y deja al domo con barras negras a los
+// costados sin importar cuanto se suba `fit`.
+const HEIGHT_GUARD = 1.6;
 
 const num = (value: string | undefined, fallback: number) => {
   const n = parseFloat(value ?? '');
@@ -209,7 +214,7 @@ export function initDomeGallery(selector = '[data-dome-gallery]') {
           basis = aspect >= 1.3 ? w : minDim;
       }
 
-      const radius = clamp(Math.min(basis * fit, h * 1.35), minRadius, maxRadius);
+      const radius = clamp(Math.min(basis * fit, h * HEIGHT_GUARD), minRadius, maxRadius);
       root.style.setProperty('--radius', `${Math.round(radius)}px`);
       applyTransform();
     });

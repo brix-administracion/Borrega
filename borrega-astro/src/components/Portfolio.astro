@@ -56,8 +56,21 @@ const items = works.flatMap((post) => {
   }
   .portfolio-dome {
     position: relative;
-    height: clamp(420px, 70vh, 760px);
+    /* El alto es lo que destraba el radio del domo: se topea contra
+       alto * 1.35, asi que sin alto no hay ancho. En telefono se mide contra
+       vw y no vh, porque un vh de telefono deja al domo como una banda fina
+       en un contenedor altisimo. */
+    height: clamp(420px, 62vw, 560px);
     margin-bottom: var(--space-4);
+  }
+
+  @media (min-width: 900px) {
+    .portfolio-dome {
+      /* min(vh, vw): el radio del domo lo fija el ANCHO disponible, asi que
+         un alto atado solo a vh deja hueco vertical en pantallas angostas
+         (a 1024px el domo llenaba apenas el 77% de su contenedor). */
+      height: clamp(520px, min(85vh, 56vw), 860px);
+    }
   }
   .portfolio-more {
     display: block;
