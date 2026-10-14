@@ -120,6 +120,47 @@ Regresiones: hover con titulo + bandera OK, click navega a `/2025/09/22/recursos
 
 A 1905px de ancho el domo sigue desbordando 137% en alto. El contenedor tiene aspecto 2.56 y el domo renderizado ~1.5: un objeto de 1.5 no puede llenar una caja de 2.56 en los dos ejes. Ya no esconde ningun proyecto porque cada uno esta en las 4 filas. Si molestara, la palanca es `segmentsY` (mas alto = filas mas juntas = menos desborde, tiles mas apaisados).
 
+---
+
+## Iteracion 3 — build resiliente contra el bloqueo de WordPress
+
+El deploy fallo en GitHub Actions con `connect ECONNREFUSED 3.140.158.15:443` dentro de `fetchAllPages`, generando `/nuestro-trabajo`. Esa IP ES borregastudio.com: el host rechazo la conexion a nivel TCP, no devolvio un 403.
+
+### Lo que encontre midiendo
+
+Instrumentando `globalThis.fetch` con `NODE_OPTIONS=--import` (sin tocar el proyecto), un build hacia **117 pedidos** a borregastudio.com:
+
+- **13 a la API** para 4 endpoints distintos. `/categories` sola seis veces. `wp.ts` no tenia ni cache ni reintentos: cada llamada salia a la red y un solo fallo tumbaba el build entero.
+- **104 descargas de imagen para 20 imagenes distintas.** Esto es culpa mia: `<Image inferSize>` resuelve la imagen una vez por cada instancia del componente, y con 104 tiles eran 104 descargas. Peor: **`inferSize` ignora la cache de Astro** — la cache guarda la salida optimizada, no ese pedido. El baseline tenia cache caliente y aun asi bajo las 104.
+
+Antes del domo el build hacia 12 pedidos. Con el domo, 117.
+
+### Tareas
+
+- [x] **T12 — `wp.ts`: memorizar.** `once(key, load)` guarda la promesa de cada coleccion; un build corre en un proceso y el contenido no cambia a mitad de camino. Si falla se saca del mapa para no heredar el rechazo. **13 -> 4 pedidos.**
+- [x] **T13 — `wp.ts`: reintentar.** `fetchWithRetry` con esperas 1/3/8/20s ante errores de red y 408/425/429/5xx. El 400 queda afuera a proposito: `fetchAllPages` lo usa como fin de paginacion. El error desenvuelve `error.cause`, que es donde Node esconde el `ECONNREFUSED`.
+- [x] **T14 — Una optimizacion por proyecto, no por tile.** `getImage()` en el frontmatter (20 llamadas) y `<img>` plano en los 104 tiles.
+- [x] **T15 — Matar `inferSize`.** `tileImageOf` devuelve el `width`/`height` que ya da WordPress (29 de 30 posts lo tienen). Para el que no, un aspecto de referencia: sin `fit`, sharp redimensiona solo por ancho y respeta el aspecto real.
+- [x] **T16 — Cache de imagenes que sobreviva al CI.** `cacheDir: './.astro-cache'` fuera de `node_modules` (que `npm ci` borra entero) + `actions/cache@v4` con clave rodante en `deploy.yml`.
+
+### Verificacion observada
+
+| | antes | despues (cache fria) | (cache caliente) |
+|---|---|---|---|
+| pedidos a la API | 13 | **4** | **4** |
+| descargas de imagen | 104 | 20 | **0** |
+| **total** | **117** | **24** | **4** |
+| tiempo de build | 13,2s | 7,3s | **3,0s** |
+
+- Reintento probado contra un puerto cerrado: 5 intentos, 34s, y el mensaje sale `WordPress no respondio tras 5 intentos (fetch failed: connect ECONNREFUSED 127.0.0.1:49517): <url>` — la misma forma que el fallo del deploy.
+- El PNG de 8334x6250 de playstation-arg sale 420x315, aspecto 1.333 = el del original. Sin deformacion.
+- Build normal: 49 paginas, 104 tiles, 20 proyectos, 260 KB de tiles, 0 imagenes rotas, todas locales (`/_astro/`).
+- Regresiones OK: hover con titulo + bandera, click navega a `/2025/09/22/recursos-humanos-bfr/`, drag gira -85 grados y no navega, 20 paradas de tabulacion, consola limpia, ancho 89% / alto 137% sin cambios.
+
+### Nota
+
+Si tras los reintentos WordPress sigue sin responder, el build falla a proposito: es preferible a deployar un sitio sin proyectos. Como el deploy es un FTP de `dist/`, un build fallido no toca nada y el sitio queda en la ultima version buena.
+
 ## Proximo paso
 
 Listo para revisar. La rama acumula ~860 lineas autoradas, por encima del presupuesto de ~400: si se va a abrir PR, conviene decidir si va entera o en slices (`stacked-to-main` o `feature-branch-chain`). Push, PR y merge quedan a decision del usuario.
