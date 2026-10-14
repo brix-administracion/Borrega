@@ -30,6 +30,7 @@ export interface DomeItem {
 interface Props {
   items: DomeItem[];
   segments?: number;
+  segmentsY?: number;
   fit?: number;
   fitBasis?: 'auto' | 'min' | 'max' | 'width' | 'height';
   minRadius?: number;
@@ -44,10 +45,15 @@ interface Props {
 
 const {
   items,
-  segments = 20,
-  fit = 0.5,
+  segments = 26,
+  // El eje vertical va mas denso que el horizontal a proposito: junta las
+  // filas (el domo desborda menos el alto del contenedor) y deja el tile
+  // apaisado en ~1.35, mucho mas cerca del 1.5 de las fotos de WordPress que
+  // un tile cuadrado, asi que el object-fit recorta bastante menos.
+  segmentsY = 30,
+  fit = 0.66,
   fitBasis = 'auto',
-  minRadius = 400,
+  minRadius = 560,
   maxRadius = Infinity,
   overlayBlurColor = '#000000',
   maxVerticalRotationDeg = 5,
@@ -68,29 +74,37 @@ const {
 // cuadrado lo hace el object-fit del tile.
 const TILE_PX = 420;
 
-const EVEN_YS = [-4, -2, 0, 2, 4];
-const ODD_YS = [-3, -1, 1, 3, 5];
+// Cuatro filas y no cinco: con cinco el domo abarca +/-40 grados verticales y
+// se desborda un 46% del alto del contenedor, asi que las filas de los
+// extremos quedan siempre recortadas. Simetricas respecto del centro.
+const EVEN_YS = [-3, -1, 1, 3];
+const ODD_YS = [-2, 0, 2, 4];
 
-const slots = Array.from({ length: segments }, (_, i) => -37 + i * 2).flatMap((x, col) =>
-  (col % 2 === 0 ? EVEN_YS : ODD_YS).map((y) => ({ x, y, sizeX: 2, sizeY: 2 })),
+// Los slots se recorren POR FILA, no por columna, y cada fila arranca unas
+// columnas mas alla. El orden importa porque el reparto de abajo es lineal:
+// recorriendo por columna, la fila de un slot quedaba determinada por su
+// indice (con 5 filas y 20 proyectos, 5 divide a 20 y cada proyecto caia
+// siempre en la misma fila; los que tocaban la de abajo no se veian nunca).
+// La rotacion por fila, ademas, separa las copias de un mismo proyecto: con
+// 3 quedan a 3 columnas minimo (con 7 caian a 1, practicamente pegadas) sin
+// perder el reparto en las 4 filas.
+const COLUMN_SHIFT = 3;
+
+const slots = EVEN_YS.flatMap((_, row) =>
+  Array.from({ length: segments }, (__, position) => {
+    const col = (position + row * COLUMN_SHIFT) % segments;
+    const ys = col % 2 === 0 ? EVEN_YS : ODD_YS;
+    return { x: -37 + col * 2, y: ys[row], sizeX: 2, sizeY: 2 };
+  }),
 );
 
-// Reparto ciclico: con 20 proyectos y 100 slots cada proyecto entra ~5 veces,
-// y el modulo garantiza que NINGUNO quede afuera. Despues se desarma cada par
-// de vecinos repetidos para que no se vea el patron del ciclo.
+// Reparto ciclico: el modulo garantiza que NINGUN proyecto quede afuera aunque
+// haya menos proyectos que slots. Como el indice avanza de a uno, dos slots
+// consecutivos nunca pueden ser el mismo proyecto: no hace falta desarmar
+// vecinos repetidos.
 const assigned: DomeItem[] = slots.map((_, i) => items[i % items.length]);
-for (let i = 1; i < assigned.length; i += 1) {
-  if (assigned[i].href !== assigned[i - 1].href) continue;
-  for (let j = i + 1; j < assigned.length; j += 1) {
-    if (assigned[j].href === assigned[i].href) continue;
-    const swap = assigned[i];
-    assigned[i] = assigned[j];
-    assigned[j] = swap;
-    break;
-  }
-}
 
-// Un proyecto repetido 5 veces serian 5 paradas de tabulacion al mismo lado.
+// Un proyecto repetido 5 veces serian 5 paradas de tabulacion al mismo sitio.
 // Solo la primera aparicion es navegable por teclado y visible para lectores
 // de pantalla; las copias quedan como superficie clickeable con el mouse.
 const primaryHrefs = new Set<string>();
@@ -116,7 +130,7 @@ const tiles = slots.map((slot, i) => {
     data-drag-dampening={dragDampening}
     data-tile-radius={imageBorderRadius}
     data-grayscale={String(grayscale)}
-    style={`--segments-x:${segments};--segments-y:${segments};--overlay-blur-color:${overlayBlurColor};--tile-radius:${imageBorderRadius};--image-filter:${grayscale ? 'grayscale(1)' : 'none'}`}
+    style={`--segments-x:${segments};--segments-y:${segmentsY};--overlay-blur-color:${overlayBlurColor};--tile-radius:${imageBorderRadius};--image-filter:${grayscale ? 'grayscale(1)' : 'none'}`}
   >
     <div class="dome__main" data-dome-main>
       <div class="dome__stage">
