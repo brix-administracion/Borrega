@@ -1,0 +1,180 @@
+---
+interface Props {
+  logos: { name: string; logo: string }[];
+  shape?: 'wave' | 'circle' | 'infinity' | 'arch' | 'line';
+  path?: string;
+  speed?: number;
+  direction?: 'forward' | 'reverse';
+  curviness?: number;
+  viewHeight?: number;
+  logoHeight?: number;
+  gap?: number;
+  ribbon?: boolean;
+  ribbonColor?: string;
+  ribbonWidth?: number;
+  pauseOnHover?: boolean;
+}
+
+const {
+  logos,
+  shape = 'wave',
+  path,
+  speed = 90,
+  direction = 'forward',
+  curviness = 28,
+  viewHeight = 160,
+  logoHeight = 56,
+  gap = 40,
+  ribbon = true,
+  ribbonColor = 'var(--color-secondary)',
+  ribbonWidth = 64,
+  pauseOnHover = true,
+} = Astro.props;
+
+const VIEW_W = 1200;
+const CY = viewHeight / 2;
+const EDGE_PAD = 6;
+
+// Todos los logos de clientes comparten el viewBox 0 0 1080 667.57, asi que
+// la relacion ancho/alto es la misma para todos y el ancho de caja se puede
+// calcular una sola vez sin medir cada imagen.
+const logoW = logoHeight * (1080 / 667.57);
+const logoH = logoHeight;
+
+// Port de buildPath de React Bits: el espacio vertical disponible descuenta
+// la mitad del ancho de la cinta y un margen para que no se recorte en el borde.
+function buildPath(shape: NonNullable<Props['shape']>, curviness: number, ribbonWidth: number, viewHeight: number) {
+  const cy = viewHeight / 2;
+  const room = Math.max(0, cy - ribbonWidth / 2 - EDGE_PAD);
+  const amp = Math.min(curviness, room);
+
+  switch (shape) {
+    case 'circle': {
+      // Radio acotado por el alto y por el ancho disponibles.
+      const r = Math.max(10, Math.min(room, VIEW_W / 2 - EDGE_PAD));
+      const cx = VIEW_W / 2;
+      return `M ${cx - r} ${cy} A ${r} ${r} 0 1 1 ${cx + r} ${cy} A ${r} ${r} 0 1 1 ${cx - r} ${cy} Z`;
+    }
+    case 'infinity': {
+      const w = VIEW_W * 0.32;
+      const cx = VIEW_W / 2;
+      const h = Math.max(4, room);
+      return (
+        `M ${cx} ${cy} ` +
+        `C ${cx + w * 0.5} ${cy - h * 1.33} ${cx + w} ${cy - h * 1.33} ${cx + w} ${cy} ` +
+        `C ${cx + w} ${cy + h * 1.33} ${cx + w * 0.5} ${cy + h * 1.33} ${cx} ${cy} ` +
+        `C ${cx - w * 0.5} ${cy - h * 1.33} ${cx - w} ${cy - h * 1.33} ${cx - w} ${cy} ` +
+        `C ${cx - w} ${cy + h * 1.33} ${cx - w * 0.5} ${cy + h * 1.33} ${cx} ${cy} Z`
+      );
+    }
+    case 'arch': {
+      const rise = Math.max(0, Math.min(curviness * 2, room * 2));
+      const base = cy + rise / 2;
+      return `M ${-100} ${base} Q ${VIEW_W / 2} ${base - rise * 2} ${VIEW_W + 100} ${base}`;
+    }
+    case 'line':
+      return `M ${-100} ${cy} L ${VIEW_W + 100} ${cy}`;
+    case 'wave':
+    default: {
+      // Onda continua de medio periodo = 300; se extiende mas alla del
+      // viewBox a ambos lados a proposito, el overflow oculta los extremos.
+      const half = 300;
+      const d = amp * (4 / 3);
+      let out = `M ${-half} ${cy}`;
+      let x = -half;
+      let sign = -1;
+      while (x < VIEW_W + half) {
+        out += ` C ${x + half * 0.4} ${cy + sign * d} ${x + half * 0.6} ${cy + sign * d} ${x + half} ${cy}`;
+        x += half;
+        sign = -sign;
+      }
+      return out;
+    }
+  }
+}
+
+const d = path ?? buildPath(shape, curviness, ribbonWidth, viewHeight);
+
+// Fallback sin JS: fila recta repartida en todo el ancho del viewBox sobre
+// CY. El script la reemplaza por la curva y arranca la animacion; sin JS
+// queda una tira estatica, casi igual al banner anterior.
+const initialTransform = (i: number) =>
+  `translate(${(i + 0.5) * (VIEW_W / logos.length)} ${CY}) translate(${-logoW / 2} ${-logoH / 2})`;
+---
+
+<div
+  class="logo-loop"
+  style={`--loop-ratio: ${VIEW_W} / ${viewHeight}`}
+  data-logo-loop
+  data-speed={speed}
+  data-direction={direction}
+  data-logo-w={logoW}
+  data-logo-h={logoH}
+  data-gap={gap}
+  data-pause-hover={pauseOnHover}
+>
+  <svg
+    viewBox={`0 0 ${VIEW_W} ${viewHeight}`}
+    preserveAspectRatio="xMidYMid slice"
+    role="img"
+    aria-label={`Clientes: ${logos.map((l) => l.name).join(', ')}`}
+  >
+    <path
+      data-logo-loop-path
+      d={d}
+      fill="none"
+      stroke={ribbon ? ribbonColor : 'none'}
+      stroke-width={ribbon ? ribbonWidth : 0}
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <g>
+      {logos.map((l, i) => (
+        <image
+          data-logo-loop-item
+          href={l.logo}
+          width={logoW}
+          height={logoH}
+          aria-hidden="true"
+          transform={initialTransform(i)}
+        />
+      ))}
+    </g>
+  </svg>
+</div>
+
+<style>
+  .logo-loop {
+    background: var(--color-bg);
+    /* Las ondas y la linea se extienden mas alla del viewBox a proposito. */
+    overflow: hidden;
+    user-select: none;
+  }
+  /* En desktop el aspect-ratio del viewBox hace que "slice" escale igual en
+     ambos ejes, o sea que no recorta nada: se comporta como "meet".
+     En mobile, en cambio, fijamos el alto: ahi manda el eje vertical, el
+     contenido escala a 0.875 y el recorte pasa a los costados. Eso muestra
+     menos logos a la vez, pero en tamanio legible. Con "meet" la banda
+     quedaba en 52px de alto y cada logo en 29px de ancho: ilegible. */
+  .logo-loop svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--loop-ratio);
+    height: auto;
+  }
+  @media (max-width: 900px) {
+    .logo-loop svg {
+      aspect-ratio: auto;
+      height: 140px;
+    }
+  }
+  /* Normaliza cualquier logo no blanco contra la cinta violeta. */
+  .logo-loop image {
+    filter: brightness(0) invert(1);
+  }
+</style>
+
+<script>
+  import { initLogoLoop } from '../scripts/logoLoop';
+  initLogoLoop();
+</script>

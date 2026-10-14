@@ -1,5 +1,6 @@
 ---
 import { getImage } from 'astro:assets';
+import LogoLoop from './LogoLoop.astro';
 import slide1Desktop from '../assets/images/hero/slide-1.png';
 import slide2Desktop from '../assets/images/hero/slide-2.png';
 import slide3Desktop from '../assets/images/hero/slide-3.png';
@@ -67,15 +68,7 @@ const slides = await Promise.all(
     </div>
   </div>
 
-  <div class="marquee">
-    <div class="marquee-track">
-      {[...clients, ...clients].map((c) => (
-        <span class="marquee-item">
-          <img src={c.logo} alt={c.name} loading="lazy" width="120" height="40" />
-        </span>
-      ))}
-    </div>
-  </div>
+  <LogoLoop logos={clients} />
 </section>
 
 <style>
@@ -110,34 +103,6 @@ const slides = await Promise.all(
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-track { transition: none; }
-  }
-
-  .marquee {
-    background: var(--color-secondary);
-    overflow: hidden;
-    padding-block: var(--space-3);
-  }
-  .marquee-track {
-    display: flex;
-    width: max-content;
-    gap: var(--space-5);
-    align-items: center;
-    animation: scroll-marquee 32s linear infinite;
-  }
-  .marquee-item { display: flex; align-items: center; height: 32px; }
-  .marquee-item img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
-    opacity: 0.9;
-  }
-  @keyframes scroll-marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-track { animation: none; }
   }
 </style>
 

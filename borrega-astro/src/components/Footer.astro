@@ -2,24 +2,26 @@
 const year = new Date().getFullYear();
 ---
 
-<section class="cta-band container" data-reveal>
-  <div class="squares squares-left" aria-hidden="true">
-    {Array.from({length: 8}).map(() => <span class="sq sq-purple"></span>)}
-  </div>
-  <div class="squares squares-right" aria-hidden="true">
-    {Array.from({length: 8}).map(() => <span class="sq sq-orange"></span>)}
-  </div>
+<section class="cta-band" data-reveal>
+  <div class="cta-band-inner container">
+    <div class="squares squares-left" aria-hidden="true">
+      {Array.from({length: 8}).map(() => <span class="sq sq-purple"></span>)}
+    </div>
+    <div class="squares squares-right" aria-hidden="true">
+      {Array.from({length: 8}).map(() => <span class="sq sq-orange"></span>)}
+    </div>
 
-  <div class="cta-card">
-    <h3>Estamos para <span class="accent-pink">ayudar</span></h3>
-    <p>Contactanos, contanos que necesitás. Trabajemos juntos.</p>
-    <a href="mailto:info@borregastudio.com" class="btn">ESCRIBINOS</a>
-  </div>
-  <div class="cta-card">
-    <img src="/images/deco/blob-kiss.png" alt="" class="deco-kiss" width="60" height="76" id="deco-kiss" />
-    <h3>¿Querés sumarte al <span class="accent-pink">rebaño</span>?</h3>
-    <p>Si te sobran ganas, si creés que tenés algo que aportar o si sólo te querés tirar el lance.</p>
-    <a href="/sumate" class="btn">POSTULATE</a>
+    <div class="cta-card">
+      <h3>Estamos para <span class="accent-pink">ayudar</span></h3>
+      <p>Contactanos, contanos que necesitás. Trabajemos juntos.</p>
+      <a href="mailto:info@borregastudio.com" class="btn">ESCRIBINOS</a>
+    </div>
+    <div class="cta-card">
+      <img src="/images/deco/blob-kiss.png" alt="" class="deco-kiss" width="60" height="76" id="deco-kiss" />
+      <h3>¿Querés sumarte al <span class="accent-pink">rebaño</span>?</h3>
+      <p>Si te sobran ganas, si creés que tenés algo que aportar o si sólo te querés tirar el lance.</p>
+      <a href="/sumate" class="btn">POSTULATE</a>
+    </div>
   </div>
 </section>
 
@@ -42,6 +44,8 @@ const year = new Date().getFullYear();
   .cta-band {
     background: var(--color-bg);
     padding-block: var(--space-6);
+  }
+  .cta-band-inner {
     display: grid;
     gap: var(--space-3);
     position: relative;
@@ -101,7 +105,7 @@ const year = new Date().getFullYear();
   .footer-legal a { text-decoration: underline; }
 
   @media (min-width: 700px) {
-    .cta-band { grid-template-columns: 1fr 1fr; }
+    .cta-band-inner { grid-template-columns: 1fr 1fr; }
   }
   @media (min-width: 900px) {
     .footer-inner { flex-direction: row; align-items: center; justify-content: space-between; }

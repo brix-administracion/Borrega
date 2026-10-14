@@ -19,12 +19,24 @@ const services = [
 
 <section id="servicios" class="services">
   <div class="container">
-    <p class="services-intro" data-reveal>
-      Trabajamos con un enfoque multidisciplinario que combina estrategia, creatividad e
-      implementación desde un mismo equipo. Acompañamos marcas bajo modalidad fee mensual o
-      por proyecto, adaptándonos a cada etapa del negocio. Pensamos, diseñamos y ejecutamos
-      soluciones que funcionan en el mundo real.
-    </p>
+    <h2 class="services-title" data-reveal>
+      Llevamos a las marcas a ser <span class="gradient-text">top of mind</span> de su cliente ideal.
+    </h2>
+    <div class="services-intro" data-reveal>
+      <p>
+        Somos Börrega, una agencia creativa de marketing y branding estratégico que transforma
+        necesidades en resultados.
+      </p>
+      <p>
+        Con base en Buenos Aires y un equipo senior, boutique y multidisciplinario brindamos
+        estrategia y ejecución desde el mismo lugar, sin intermediarios. Acompañamos marcas bajo
+        modalidad fee mensual (Börrega Inside) o por proyecto, adaptándonos a cada etapa del negocio.
+      </p>
+      <p>
+        <strong>No seguimos al rebaño:</strong> pensamos distinto, actuamos con precisión y nos
+        gusta hacerlo bien.
+      </p>
+    </div>
     <ul class="services-cloud" data-reveal>
       {services.map((s) => (
         <li class:list={['tag', `tag-${s.color}`]}>{s.label}</li>
@@ -35,7 +47,32 @@ const services = [
 
 <style>
   .services { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5); }
+  .services-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    /* Medido: por debajo de 32ch el salto de linea cae en medio de "top of
+       mind" y la frase queda partida entre las dos lineas. Con 34ch el corte
+       va donde el diseno original: linea 1 termina en "top of mind". */
+    max-width: 34ch;
+    margin: 0 auto var(--space-3);
+    text-align: center;
+  }
+  /* El degrade se pinta sobre el bounding box del inline: si la frase se parte
+     en dos lineas, cada fragmento recibe su propio tramo y el corte se nota.
+     El nowrap la mantiene como una unidad, asi el degrade queda entero sea
+     cual sea el ancho. */
+  .gradient-text {
+    white-space: nowrap;
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
   .services-intro { max-width: 62ch; margin: 0 auto var(--space-4); text-align: center; opacity: 0.85; }
+  /* El proyecto no resetea el margen de <p>, lo fijamos para no depender
+     del default del navegador. */
+  .services-intro p { margin: 0 0 var(--space-2); }
+  .services-intro p:last-child { margin-bottom: 0; }
   .services-cloud {
     list-style: none;
     margin: 0;
