@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import type { WPCountry } from '../lib/wp';
 
 // Domo 3D de imagenes (port del concepto DomeGallery de React Bits, sin
@@ -18,6 +18,9 @@ import type { WPCountry } from '../lib/wp';
 
 export interface DomeItem {
   src: string;
+  /** Tamaño de origen segun WordPress. Puede faltar (ver tileImageOf). */
+  width?: number;
+  height?: number;
   alt: string;
   /** title.rendered de WP: puede traer entidades HTML, va con set:html. */
   titleHtml: string;
@@ -69,9 +72,7 @@ const {
 // Las imagenes se optimizan en el build con astro:assets (el dominio de WP ya
 // esta habilitado en image.domains). No alcanza con pedirle a WordPress un
 // size chico: hay proyectos cuya featured image nunca se proceso y WP solo
-// tiene el original — el de playstation-arg pesa 13 MB. Pasa width sin height
-// a proposito: la altura sale del aspecto real de cada imagen y el recorte
-// cuadrado lo hace el object-fit del tile.
+// tiene el original — el de playstation-arg pesa 13 MB.
 const TILE_PX = 420;
 
 // Cuatro filas y no cinco: con cinco el domo abarca +/-40 grados verticales y
@@ -103,6 +104,37 @@ const slots = EVEN_YS.flatMap((_, row) =>
 // consecutivos nunca pueden ser el mismo proyecto: no hace falta desarmar
 // vecinos repetidos.
 const assigned: DomeItem[] = slots.map((_, i) => items[i % items.length]);
+
+// Una optimizacion por PROYECTO y no por tile. El componente <Image> resuelve
+// la imagen una vez por cada instancia suya, asi que con 104 tiles el build le
+// pedia 104 descargas a WordPress para 20 imagenes distintas — y la cache de
+// Astro no lo evitaba, porque guarda la salida optimizada y no ese pedido.
+// getImage() lo resuelve una sola vez y los tiles reusan la URL.
+const optimized = new Map<string, { src: string; width: number; height: number }>();
+await Promise.all(
+  items.map(async (item) => {
+    if (optimized.has(item.src)) return;
+    const result = await getImage({
+      src: item.src,
+      width: TILE_PX,
+      // Con el tamaño que ya da WordPress, Astro no necesita bajar la imagen
+      // para medirla. Cuando no lo da (ver tileImageOf) se usa un aspecto de
+      // referencia en vez de inferSize: inferSize IGNORA la cache de Astro y
+      // vuelve a bajar el original en cada build — el de playstation-arg son
+      // 13 MB. Sin `fit`, sharp redimensiona solo por ancho y respeta el
+      // aspecto real, asi que esta altura es apenas el atributo del <img>, y
+      // encima el tile la pisa con object-fit: cover.
+      height: Math.round(((item.height ?? 2) / (item.width ?? 3)) * TILE_PX),
+      format: 'webp',
+      quality: 72,
+    });
+    optimized.set(item.src, {
+      src: result.src,
+      width: Number(result.attributes.width ?? TILE_PX),
+      height: Number(result.attributes.height ?? TILE_PX),
+    });
+  }),
+);
 
 // Un proyecto repetido 5 veces serian 5 paradas de tabulacion al mismo sitio.
 // Solo la primera aparicion es navegable por teclado y visible para lectores
@@ -147,13 +179,11 @@ const tiles = slots.map((slot, i) => {
                 tabindex={tile.primary ? undefined : '-1'}
                 aria-hidden={tile.primary ? undefined : 'true'}
               >
-                <Image
-                  src={tile.item.src}
-                  inferSize
-                  width={TILE_PX}
+                <img
+                  src={optimized.get(tile.item.src)!.src}
+                  width={optimized.get(tile.item.src)!.width}
+                  height={optimized.get(tile.item.src)!.height}
                   alt={tile.primary ? tile.item.alt : ''}
-                  format="webp"
-                  quality={72}
                   loading="lazy"
                   decoding="async"
                   draggable={false}

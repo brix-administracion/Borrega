@@ -14,9 +14,14 @@ const items = works.flatMap((post) => {
   // de detalle, solo no entra al domo.
   if (!img) return [];
   const label = post.title.rendered.replace(/<[^>]+>/g, '');
+  const tile = tileImageOf(img);
   return [
     {
-      src: tileImageOf(img),
+      src: tile.src,
+      // Las dimensiones vienen de WordPress para que el domo no tenga que
+      // bajar cada imagen solo para medirla.
+      width: tile.width,
+      height: tile.height,
       alt: img.alt_text || label,
       titleHtml: post.title.rendered,
       label,
