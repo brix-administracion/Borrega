@@ -72,6 +72,7 @@ export interface WPCategory {
   slug: string;
   name: string;
   count: number;
+  parent: number;
 }
 
 // Trae todas las paginas de una coleccion paginada de WP (per_page max 100).
@@ -116,6 +117,23 @@ export function getAllCategories() {
 
 export function featuredImageOf(post: WPPost): WPMedia | undefined {
   return post._embedded?.['wp:featuredmedia']?.[0];
+}
+
+// Las featured images de WordPress llegan en tamaño original (2560px y mas).
+// Para miniaturas eso es insostenible, sobre todo en el domo del home, que
+// pinta 100 tiles. Elegimos el tamaño mas chico que siga viendose bien en
+// retina y caemos para atras si WP no genero ese size.
+const TILE_SIZE_PREFERENCE = ['medium_large', 'large', 'medium'] as const;
+
+export function tileImageOf(media: WPMedia): string {
+  const sizes = media.media_details?.sizes;
+  if (sizes) {
+    for (const name of TILE_SIZE_PREFERENCE) {
+      const size = sizes[name];
+      if (size?.source_url) return size.source_url;
+    }
+  }
+  return media.source_url;
 }
 
 // El "Blog" real del sitio (borregastudio.com/borrega-blog/) NO muestra
@@ -170,4 +188,53 @@ export async function getWorkPosts(limit?: number): Promise<WPPost[]> {
   const [blogCategoryId, all] = await Promise.all([getBlogCategoryId(), getAllPosts()]);
   const work = all.filter((p) => blogCategoryId == null || !p.categories.includes(blogCategoryId));
   return typeof limit === 'number' ? work.slice(0, limit) : work;
+}
+
+// ---------------------------------------------------------------------------
+// Pais de cada proyecto
+// El pais NO es un campo propio del post: en WordPress se modela como las
+// categorias hijas de "Por pais" (slug `pais`). Buscamos la hija por `parent`
+// en vez de hardcodear ids, asi la clienta puede agregar un pais nuevo en WP
+// y solo hace falta sumar su ISO al mapa de abajo.
+//
+// La bandera si la ponemos nosotros: en WordPress no hay un asset por
+// proyecto. La media library tiene UNA sola imagen de bandera (la argentina)
+// y la plantilla de Elementor la hardcodea para todos los proyectos, incluso
+// los que no son de Argentina. Servimos un SVG local por pais desde /flags/.
+const COUNTRY_PARENT_SLUG = 'pais';
+
+const COUNTRY_ISO: Record<string, string> = {
+  argentina: 'ar',
+  brasil: 'br',
+  usa: 'us',
+  espana: 'es',
+  francia: 'fr',
+  australia: 'au',
+  'puerto-rico': 'pr',
+};
+
+export interface WPCountry {
+  slug: string;
+  name: string;
+  iso: string;
+}
+
+export async function getCountryCategories(): Promise<WPCategory[]> {
+  const categories = await getAllCategories();
+  const parent = categories.find((c) => c.slug === COUNTRY_PARENT_SLUG);
+  // Si la taxonomia de paises desaparece de WP, los proyectos siguen
+  // renderizando sin bandera en vez de romper el build.
+  if (!parent) return [];
+  return categories.filter((c) => c.parent === parent.id);
+}
+
+// Hay proyectos que tienen la categoria padre "Por pais" pero ninguna hija
+// (por ejemplo la campaña de PlayStation), asi que el pais es opcional y
+// quien renderiza tiene que aguantar `undefined`.
+export function countryOf(post: WPPost, countries: WPCategory[]): WPCountry | undefined {
+  const match = countries.find((c) => post.categories.includes(c.id));
+  if (!match) return undefined;
+  const iso = COUNTRY_ISO[match.slug];
+  if (!iso) return undefined;
+  return { slug: match.slug, name: match.name, iso };
 }
