@@ -27,8 +27,10 @@ const RETRY_DELAYS_MS = [1000, 3000, 8000, 20000];
 
 // Solo lo que puede arreglarse esperando. El 400 NO entra: fetchAllPages lo
 // usa como señal de "no hay mas paginas" y reintentarlo agregaria medio
-// minuto por coleccion. El 403 y el 404 tampoco mejoran solos.
-const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+// minuto por coleccion. El 404 tampoco mejora solo. El 403 SI entra: desde
+// las IPs de GitHub Actions el anti-bots del hosting lo devuelve de forma
+// intermitente (desde una IP residencial la misma URL da 200).
+const RETRYABLE_STATUS = new Set([403, 408, 425, 429, 500, 502, 503, 504]);
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -39,13 +41,24 @@ function describeError(error: unknown): string {
   return error.message;
 }
 
+// Un 403 de WordPress y uno del firewall del hosting se ven igual en el log.
+// El header `server` y el comienzo del cuerpo dicen quien lo corto.
+async function describeResponse(res: Response, path: string): Promise<string> {
+  const server = res.headers.get('server') || 'desconocido';
+  const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 300);
+  return `WP API error ${res.status} on ${path} (server: ${server}) ${body}`;
+}
+
 async function fetchWithRetry(url: string): Promise<Response> {
   let lastReason = 'sin detalle';
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     if (attempt > 0) await wait(RETRY_DELAYS_MS[attempt - 1]);
     try {
       const res = await fetch(url, { headers: WP_HEADERS });
-      if (res.ok || !RETRYABLE_STATUS.has(res.status)) return res;
+      // En el ultimo intento se devuelve igual, para que el error final
+      // muestre status, server y cuerpo en vez de un mensaje generico.
+      const lastAttempt = attempt === RETRY_DELAYS_MS.length;
+      if (res.ok || !RETRYABLE_STATUS.has(res.status) || lastAttempt) return res;
       lastReason = `HTTP ${res.status}`;
     } catch (error) {
       // Errores de red: ECONNREFUSED, ECONNRESET, ETIMEDOUT, EAI_AGAIN...
@@ -81,7 +94,7 @@ function once<T>(key: string, load: () => Promise<T>): Promise<T> {
 async function wpFetch<T>(path: string): Promise<T> {
   const res = await fetchWithRetry(`${API}${path}`);
   if (!res.ok) {
-    throw new Error(`WP API error ${res.status} on ${path}`);
+    throw new Error(await describeResponse(res, path));
   }
   return res.json() as Promise<T>;
 }
@@ -143,7 +156,7 @@ async function fetchAllPages<T>(basePath: string, extraParams = ''): Promise<T[]
     const res = await fetchWithRetry(`${API}${basePath}?per_page=${perPage}&page=${page}${extraParams}`);
     if (!res.ok) {
       if (res.status === 400) break; // no hay mas paginas
-      throw new Error(`WP API error ${res.status} on ${basePath}`);
+      throw new Error(await describeResponse(res, basePath));
     }
     const batch = (await res.json()) as T[];
     results = results.concat(batch);
