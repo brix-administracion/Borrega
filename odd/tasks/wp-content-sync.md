@@ -66,10 +66,10 @@ GitHub App con permiso minimo y secreto rotable.
 
 ## Tareas
 
-- [ ] **T1 — Confirmar el origen de la galeria.** *Bloqueada: necesita admin de WP (Ignacio).* Ver **Custom Fields -> Field Groups** y activar *Show in REST API* al grupo que alimenta los widgets de galeria del template 1596. Check: `curl .../posts?slug=recursos-humanos-bfr | jq '.[0].acf'` deja de ser `[]`. Fallback si no existe el grupo: crearlo y migrar los 20 trabajos una vez con un script server-side dentro de WP (sin exponer nada).
+- [x] **T1 — Confirmar el origen de la galeria.** La hipotesis se confirmo: el grupo ya existia y la clienta ya lo llenaba, solo tenia apagado el toggle de REST. Ignacio lo activo el 23/10. Sin codigo, sin migracion, sin cambio de flujo para la clienta. Detalle abajo.
 - [x] **T2 — Allowlist de paginas.** Ruta: inline (3 archivos, mecanico, sin research). `EXCLUDED_SLUGS` -> `ALLOWED_PAGE_SLUGS` en `pageSlugs.ts`; ajustados `[slug].astro` y `sitemap.xml.ts`, que leen la misma lista. Commit `c7b161d8`.
-- [ ] **T3 — Dos plantillas de detalle.** Ruta: delegada (relevamiento en vivo + escritura juntos; dispara el trigger de preparacion y el de writer). Relevar los templates 1596 (trabajo) y 2399 (blog) en vivo y reproducirlos. Check: `npm run build` + comparacion lado a lado en navegador.
-- [ ] **T4 — Galeria del trabajo en la plantilla.** *Depende de T1.* Consumir el campo de ACF, resolver cada imagen con `getImage()`, maquetar las dos galerias.
+- [x] **T3 — Dos plantillas de detalle.** Ruta: delegada. `WorkPost.astro`, `BlogPost.astro`, `PostBody.astro`, `RelatedPosts.astro`, `ShareLinks.astro` en `src/components/post/`. Commit `29fc17c4`.
+- [x] **T4 — Galeria del trabajo en la plantilla.** Capa de datos en `wp.ts` (commit `7cae3d8d`) + `postImages.ts` y el markup (commit `29fc17c4`).
 - [x] **T5 — Optimizar imagenes de blog y trabajos.** Ruta: delegada (4 archivos). `getImage()` + `tileImageOf()` en el detalle y los dos listados, replicando `Portfolio.astro`. `cleanContent` conserva `width`/`height`. Commit `1952db93`.
 - [x] **T6 — `schedule:` en el workflow.** Ruta: inline (1 archivo, trivial). Cron de 6 h en `deploy.yml`, `repository_dispatch` queda declarado. Commit `5d17c3f7`.
 
@@ -188,17 +188,131 @@ Es upstream; no se arregla desde el proyecto.
    grupos de 3 separados por 16s, o sea los 17 agotaban los 5 intentos.
 2. *"Es el proxy del sandbox"*. No hay variables de proxy en el entorno.
 
+### T1 resuelta — el field group "Single Project"
+
+El grupo es **"Single Project"** (`group_68b9d199bb8af`, ubicacion Entradas, 5
+campos). Estaba activo y lleno; lo unico apagado era *Ajustes -> Ajustes de grupo
+-> Mostrar en la API REST*. Un switch, nada mas.
+
+Forma exacta de los 5 campos, verificada en vivo. **Todos los de imagen devuelven
+IDs de media, no objetos ni URLs:**
+
+| campo | tipo | ejemplo | cobertura |
+|---|---|---|---|
+| `galeria_proyecto` | `number[]` | `[609,610,...,621]` | **20/20**, de 3 a 12 imagenes |
+| `software` | `number[]` | `[1763,1758,1917,1919]` | 19/20, de 0 a 11 (logos SVG) |
+| `cover` | `number` | `608` | 20/20 |
+| `pais` | `number` | `1716` (`Flag_of_Argentina-copy.jpg`) | 20/20 |
+| `link` | `string` | `https://cocoinnova.com/` | 5/20 |
+
+**154 ids de media distintos** en los 20 trabajos.
+
+Validacion cruzada: `galeria_proyecto` de `recursos-humanos-bfr` resuelve
+exactamente a las 9 imagenes que muestra la pagina en vivo (`Bruchou-RH_brand-1..4`
+mas los `@3x` de pilares). El campo ES la fuente de la galeria que renderiza el
+template 1596.
+
+**Auditoria de exposicion** (se activo un acceso publico, habia que mirarlo): los 5
+campos son ids de media mas un `link` que, en los 5 casos no vacios, es una URL
+publica — un YouTube y 4 sitios de clientes. No se expuso nada interno.
+
+Detalles de implementacion ya verificados:
+
+1. **Resolver los ids en bloque.** `/media?include=<hasta 100 ids>&per_page=100`
+   devuelve los 100 en UN pedido, con `media_details.width/height` en el 100% y
+   `sizes.medium_large` en el 98%. Los 154 salen en **2 pedidos**: el build pasa de
+   4 a 6. De a uno serian 154.
+2. **Hay que preservar el orden del array de ACF.** El endpoint de media devuelve
+   por id DESCENDENTE (621, 620, 619, 614...) y ACF guarda el orden que armo la
+   clienta (609, 610, 611...). Reordenar por el array de ACF o las galerias salen
+   al reves.
+3. **Los logos de `software` son SVG** (ej. `adobe-dw.svg` 48x48). No pasarlos por
+   `getImage()`/sharp: servirlos tal cual.
+4. `cover` **NO** es la featured image. En `recursos-humanos-bfr`, `cover` = 608 =
+   `conectamos@3x.png`, y la featured es `Bruchou-RH_brand-4-copia.jpg`.
+5. `pais` es una bandera JPG en WP. Se sigue usando la SVG local de
+   `public/flags/` via `countryOf`: mas chica y sin pedido extra.
+6. ACF devuelve `""` (string vacio) para campos vacios, y los posts de blog traen
+   `acf: []` en vez de un objeto. El tipado tiene que tolerar las tres formas.
+
+### Verificacion observada — T3 y T4 (plantillas y galerias)
+
+`npx tsc --noEmit`: exit 0. `npm run build`: 47 paginas en 12,5s, sin errores.
+
+- **Pedidos a la API: 6** — los 4 de siempre mas los 2 de `/media`. El objetivo
+  se cumplio: resolver los 152 ids de las galerias cuesta 2 pedidos en todo el
+  build, no 2 por pagina de detalle (serian 40).
+- 30 posts generados, las URLs `/YYYY/MM/DD/slug/` sin cambios.
+- `recursos-humanos-bfr`: sus **9 imagenes** de galeria, con
+  `Bruchou-RH_brand-1-copia` primera — o sea el orden es el de ACF y no el de la
+  respuesta de la API. Tiene SOFTWARE, el CTA de consultoria y "Mas proyectos",
+  y NO tiene el CTA de blog. Un solo `<h1>`.
+- Un post de blog tiene "Solicitar mas informacion" y "Mas articulos", y NO tiene
+  SOFTWARE.
+- El typo del original ("consutoria") no se replico.
+
+### Desvios del plan — T3 y T4
+
+1. **Hay un `.mp4` dentro de una galeria** (`Web-gif.mp4`). El primer build fallo
+   con `CouldNotTransformImage`: sharp no procesa video. Se sirve con `<video
+   autoplay muted loop playsinline>`. Los SVG y GIF tambien pasan de largo, porque
+   sharp aplanaria un GIF animado.
+2. **Sin lightbox.** El original usa el visor de Elementor. No existe equivalente
+   en el proyecto y no se agregaron dependencias: cada imagen enlaza a su webp
+   grande, igual que `PhotoGallery.astro`.
+3. **`PhotoGallery.astro` no se reuso.** Es una grilla de 2-3 columnas con
+   `aspect-ratio` 4/3 y recorte, pensada para `ImageMetadata` local. La galeria del
+   trabajo va a una columna y a su aspecto real.
+4. Se sumo "Volver a nuestro trabajo" en el pie del trabajo, que no estaba en la
+   estructura relevada.
+
+### Acoplamiento que queda con WordPress (medido, no resuelto)
+
+En las paginas de detalle quedan **96 referencias remotas a borregastudio.com**:
+**19 logos SVG distintos** de la seccion SOFTWARE mas **1 `.mp4`**. Son los unicos
+assets que un visitante sigue bajando de WordPress; todo lo demas es local.
+
+No se resolvio a proposito. Las opciones tienen contra:
+
+- Bajarlos a `public/software/` rompe el "la clienta sube y aparece": un logo nuevo
+  en WP quedaria roto hasta que alguien copie el archivo.
+- Bajarlos en cada build con un prebuild script lo mantiene auto-reparable, pero
+  agrega ~19 pedidos por build al host que ya devolvio 403 desde CI, mas un paso
+  de build.
+- Inlinear los SVG en el HTML es peor para seguridad: un `<img src=...svg>` no
+  ejecuta scripts del SVG, un `<svg>` inline si.
+
+Queda como decision del usuario. Riesgo si no se toca: si algun dia WordPress se
+apaga o se migra, los logos de SOFTWARE y ese video desaparecen de las paginas de
+trabajo. Las paginas siguen funcionando.
+
 ## Estado de delivery
 
-Rama: **240 lineas autoradas** en 3 commits, por debajo del presupuesto de ~400.
-T3 sumaria unas 350 y lo cruzaria, asi que antes de empezarla hay que elegir el
-corte (`stacked-to-main` o `feature-branch-chain`) segun la estrategia
-`ask-on-risk`.
+**Las 6 tareas cerradas.** Rama `feat/wp-content-sync`: **1182 lineas autoradas**
+en 6 commits, sobre un presupuesto de ~400 por slice.
+
+Se ofrecio cortar en dos PRs (los 4 primeros commits son una unidad coherente que
+no depende de las plantillas) y el usuario eligio **una sola rama**: hace el merge
+el mismo. Queda sin cortar a pedido suyo.
+
+| commit | tarea |
+|---|---|
+| `c7b161d8` | T2 allowlist de paginas |
+| `5d17c3f7` | T6 cron de 6h |
+| `1952db93` | T5 optimizacion de imagenes |
+| `7c29b532` | documento ODD |
+| `7cae3d8d` | T4 capa de datos ACF |
+| `29fc17c4` | T3 y T4 plantillas y galerias |
 
 ## Proximo paso
 
-T2, T5 y T6 cerradas, verificadas y commiteadas; son independientes entre si y se
-pueden entregar ya. T3 y T4 quedan pendientes y las dos necesitan a Ignacio
-primero: las dos secciones mas visibles de la plantilla de trabajo son galerias
-(las imagenes del proyecto y los logos de SOFTWARE), y las dos estan bloqueadas
-por T1. Construir esa plantilla antes de confirmar T1 implica hacerla dos veces.
+Todo el plan esta implementado y verificado. Lo que queda es del usuario:
+
+1. **Merge a `main`.** Importa mas de lo que parece: GitHub solo corre `schedule:`
+   desde la rama default, asi que **el cron no empieza a disparar hasta que esto
+   este en `main`**. Hasta entonces el contenido nuevo sigue necesitando el boton
+   manual de Actions.
+2. **Decidir sobre los 19 SVG y el video remotos** (ver arriba). No bloquea nada.
+3. **Pendiente de antes, fuera de esta feature:** la Access Key de Web3Forms en
+   `borrega-astro/src/lib/formConfig.ts` sigue con el placeholder, asi que Sumate y
+   Form Kickoff no envian nada.
