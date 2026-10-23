@@ -1,10 +1,29 @@
 name: Build & Deploy Börrega
 
 # Dispara el build + deploy del sitio Astro cuando:
-#  - WordPress avisa que se publico/edito contenido (repository_dispatch)
+#  - cada 6 horas, para levantar el contenido que publique la clienta (schedule)
 #  - se corre manualmente desde la pestaña Actions (workflow_dispatch)
 #  - se pushea un cambio del front (push a main dentro de borrega-astro/)
+#  - WordPress avisa que se publico/edito contenido (repository_dispatch)
+#
+# El schedule es a proposito en vez de un webhook desde WordPress. Un webhook
+# necesita un token de GitHub con `contents: write` guardado en la base de WP,
+# y el riesgo no es el token: es la cadena. Si comprometen el WordPress
+# (Elementor + ACF + plugins es blanco habitual), ese token da push al repo, y
+# este repo deploya solo a produccion. El cron no necesita ninguna credencial
+# nueva ni expone ningun endpoint.
+#
+# Costo en pedidos: `wp.ts` memoriza cada coleccion por build, asi que un build
+# sin novedades son 4 pedidos a borregastudio.com. A 6 h son 16 pedidos por dia,
+# muy lejos de despertar el anti-bots del hosting (que ya nos devolvio 403
+# intermitente desde las IPs de Actions).
+#
+# repository_dispatch queda declarado pero nadie lo dispara hoy. Si algun dia se
+# necesita publicacion instantanea, el camino seguro es una GitHub App con
+# permiso minimo y secreto rotable, no un token personal dentro de WordPress.
 on:
+  schedule:
+    - cron: '0 */6 * * *'
   repository_dispatch:
     types: [content-updated]
   workflow_dispatch:
@@ -14,9 +33,13 @@ on:
       - 'borrega-astro/**'
       - '.github/workflows/deploy.yml'
 
+# Los runs se encolan, no se cancelan. El deploy es un FTP archivo por archivo:
+# cancelarlo a mitad de la subida deja HTML nuevo apuntando a assets hasheados
+# que todavia no llegaron, o sea el sitio roto hasta el run siguiente. Encolar
+# cuesta unos minutos de espera y no tiene esa ventana.
 concurrency:
   group: deploy-borrega
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build-deploy:

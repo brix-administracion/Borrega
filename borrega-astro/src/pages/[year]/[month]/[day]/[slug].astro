@@ -1,7 +1,9 @@
 ---
+import { getImage } from 'astro:assets';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
-import GradientHero from '../../../../components/GradientHero.astro';
-import { getAllPosts, getBlogCategoryId, isPublicBlogPost, featuredImageOf, postPath } from '../../../../lib/wp';
+import BlogPost from '../../../../components/post/BlogPost.astro';
+import WorkPost from '../../../../components/post/WorkPost.astro';
+import { getAllPosts, getBlogCategoryId, isPublicBlogPost, featuredImageOf, tileImageOf, postPath } from '../../../../lib/wp';
 import { cleanElementorHtml } from '../../../../lib/cleanContent';
 
 export async function getStaticPaths() {
@@ -27,140 +29,46 @@ const { post, isPublic } = Astro.props;
 const img = featuredImageOf(post);
 const content = cleanElementorHtml(post.content.rendered);
 const title = post.title.rendered;
+
+// La plantilla sale de la MISMA senal que el noindex: un post con la categoria
+// `blogpost` es del blog; el resto es un trabajo (o un post privado que la
+// clienta comparte por fuera, que en WordPress tambien usa la plantilla de
+// trabajo). Las URLs no cambian: getStaticPaths sigue generando los 30.
+const template = isPublic ? 'blog' : 'work';
+
+// og:image la leen scrapers externos (WhatsApp, LinkedIn, Twitter, Slack) y no
+// un navegador, asi que no comparte la imagen del articulo: va aparte.
+//
+// - JPEG y no webp: es el unico formato que aceptan todos. LinkedIn en
+//   particular lo viene manejando mal, y es justo donde se comparte el trabajo
+//   de una agencia.
+// - 1200px es el ancho que recomienda Open Graph para la preview grande; por
+//   debajo de 600 varias plataformas caen a una miniatura.
+// - URL absoluta: el layout emite og:image tal cual, una relativa se rompe.
+//
+// Antes se mandaba el original de WordPress, que para playstation-arg son 13 MB
+// de PNG: ningun scraper lo previsualizaba.
+const OG_IMAGE_PX = 1200;
+
+let ogImage = img?.source_url;
+if (img) {
+  const item = tileImageOf(img);
+  const result = await getImage({
+    src: item.src,
+    width: OG_IMAGE_PX,
+    height: Math.round(((item.height ?? 630) / (item.width ?? 1200)) * OG_IMAGE_PX),
+    format: 'jpeg',
+    quality: 78,
+  });
+  ogImage = new URL(result.src, Astro.site).href;
+}
 const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 ---
 
-<BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={img?.source_url} noindex={!isPublic}>
-  <GradientHero>
-    <Fragment set:html={title} />
-  </GradientHero>
-
-  <article class="post">
-    <div class="container post-grid">
-      <div class="post-content" data-reveal>
-        <Fragment set:html={content} />
-        <img src="/images/deco/borrega-signature.png" alt="Börrega" class="signature" width="140" height="70" />
-      </div>
-
-      <aside class="post-sidebar">
-        {img && (
-          <img class="post-featured" src={img.source_url} alt={img.alt_text || ''} width="600" height="450" loading="eager" />
-        )}
-        <div class="cta-card">
-          <img src="/images/deco/ok.png" alt="" class="cta-deco" width="40" height="58" />
-          <h3>Solicitar <span class="accent-pink">más información</span></h3>
-          <p>Si el artículo te pareció interesante y quisieras que nos comuniquemos para trabajar juntos no dudes en agendar tu reunión.</p>
-          <a href="/reservar-consulta" class="btn">AGENDAR REUNIÓN</a>
-        </div>
-      </aside>
-    </div>
-
-    <div class="container post-footer">
-      {isPublic ? (
-        <a href="/borrega-blog" class="back-link">&larr; Volver a todos los Posts</a>
-      ) : <span />}
-      <div class="share-links">
-        <a href={`https://www.facebook.com/sharer/sharer.php?u=https://www.borregastudio.com${postPath(post)}`} target="_blank" rel="noopener" aria-label="Compartir en Facebook">f</a>
-        <a href={`https://www.linkedin.com/sharing/share-offsite/?url=https://www.borregastudio.com${postPath(post)}`} target="_blank" rel="noopener" aria-label="Compartir en LinkedIn">in</a>
-        <a href={`https://twitter.com/intent/tweet?url=https://www.borregastudio.com${postPath(post)}`} target="_blank" rel="noopener" aria-label="Compartir en Twitter">X</a>
-      </div>
-    </div>
-  </article>
+<BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={ogImage} noindex={!isPublic}>
+  {template === 'blog' ? (
+    <BlogPost post={post} content={content} isPublic={isPublic} />
+  ) : (
+    <WorkPost post={post} content={content} />
+  )}
 </BaseLayout>
-
-<style>
-  .post {
-    background: var(--color-bg);
-    color: var(--color-white);
-    padding-block: var(--space-5);
-  }
-  .post-grid {
-    display: grid;
-    gap: var(--space-4);
-  }
-  .post-content :global(p) {
-    color: rgba(255, 255, 255, 0.85);
-    margin-bottom: var(--space-2);
-  }
-  .post-content :global(h2) {
-    font-size: 1.5rem;
-    margin-top: var(--space-4);
-  }
-  .post-content :global(h3) {
-    font-size: 1.2rem;
-    margin-top: var(--space-3);
-  }
-  .post-content :global(ul),
-  .post-content :global(ol) {
-    color: rgba(255, 255, 255, 0.85);
-    padding-left: 1.4rem;
-    margin-bottom: var(--space-2);
-  }
-  .post-content :global(li) { margin-bottom: 0.4rem; }
-  .post-content :global(blockquote) {
-    border-left: 3px solid var(--color-accent);
-    padding-left: var(--space-2);
-    font-style: italic;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .post-content { border-left: 2px solid var(--color-accent); padding-left: var(--space-3); }
-  .signature { margin-top: var(--space-4); }
-
-  .post-featured {
-    width: 100%;
-    border-radius: var(--radius-md);
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-  }
-
-  .cta-card {
-    position: relative;
-    background: #16161a;
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
-    text-align: center;
-    margin-top: var(--space-3);
-  }
-  .cta-deco {
-    position: absolute;
-    top: -20px;
-    left: var(--space-3);
-  }
-  .cta-card h3 { font-size: 1.4rem; }
-  .accent-pink { color: var(--color-pink); }
-  .cta-card p {
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 0.9rem;
-    margin-block: var(--space-2);
-  }
-  .cta-card .btn { border-color: var(--color-white); }
-
-  .post-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    padding-top: var(--space-3);
-    margin-top: var(--space-4);
-  }
-  .back-link { color: var(--color-white); font-weight: 600; }
-  .share-links { display: flex; gap: var(--space-2); }
-  .share-links a {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
-
-  @media (min-width: 900px) {
-    .post-grid { grid-template-columns: 2fr 1fr; align-items: start; }
-    .post-sidebar { position: sticky; top: calc(var(--space-3) + 70px); }
-  }
-</style>

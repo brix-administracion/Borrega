@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getAllPages, getBlogPosts, postPath } from '../lib/wp';
-import { EXCLUDED_SLUGS } from '../lib/pageSlugs';
+import { ALLOWED_PAGE_SLUGS } from '../lib/pageSlugs';
 
 // Sitemap generado a mano (no @astrojs/sitemap) porque necesitamos la
 // misma logica de "publico vs privado" que ya usamos en el blog: los
@@ -32,11 +32,13 @@ const STATIC_ROUTES = [
 // /formulario/ tampoco se lista: es un redirect a /sumate/, no una pagina.
 
 export const GET: APIRoute = async () => {
-  const excluded = new Set(EXCLUDED_SLUGS);
+  const allowed = new Set(ALLOWED_PAGE_SLUGS);
 
   const [wpPages, publicPosts] = await Promise.all([getAllPages(), getBlogPosts()]);
 
-  const wpPageUrls = wpPages.filter((p) => !excluded.has(p.slug)).map((p) => `/${p.slug}/`);
+  // Solo las paginas de WP que la allowlist habilita. Una pagina nueva en
+  // WordPress no entra al sitemap hasta que alguien la agregue a mano.
+  const wpPageUrls = wpPages.filter((p) => allowed.has(p.slug)).map((p) => `/${p.slug}/`);
 
   const blogUrls = publicPosts.map((post) => postPath(post));
 

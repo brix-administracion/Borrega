@@ -23,6 +23,8 @@ function stripAttributesDeep(el: HTMLElement) {
     const href = node.getAttribute('href');
     const src = node.getAttribute('src');
     const alt = node.getAttribute('alt');
+    const width = node.getAttribute('width');
+    const height = node.getAttribute('height');
     const cls = node.getAttribute('class') || '';
     const isBtn = /\bbtn\b/.test(cls);
     const attrs = { ...node.attributes };
@@ -30,6 +32,11 @@ function stripAttributesDeep(el: HTMLElement) {
     if (href) node.setAttribute('href', href);
     if (src) node.setAttribute('src', src);
     if (alt !== undefined && alt !== null) node.setAttribute('alt', alt);
+    // width/height son inocuos y le dejan al navegador reservar el espacio de la
+    // imagen antes de que cargue (sin salto de layout). srcset en cambio se sigue
+    // descartando: apunta a archivos de WordPress sin optimizar.
+    if (width) node.setAttribute('width', width);
+    if (height) node.setAttribute('height', height);
     if (isBtn) node.setAttribute('class', 'btn');
     if (node.tagName?.toLowerCase() === 'a' && (href?.startsWith('http') ?? false)) {
       node.setAttribute('target', '_blank');
