@@ -4,7 +4,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import BlogPost from '../../../../components/post/BlogPost.astro';
 import WorkPost from '../../../../components/post/WorkPost.astro';
 import { getAllPosts, getBlogCategoryId, isPublicBlogPost, featuredImageOf, tileImageOf, postPath } from '../../../../lib/wp';
-import { cleanElementorHtml } from '../../../../lib/cleanContent';
+import { cleanElementorHtml, plainTextFromHtml } from '../../../../lib/cleanContent';
 
 export async function getStaticPaths() {
   // OJO: traemos TODOS los posts (no solo los del blog publico). La
@@ -62,7 +62,7 @@ if (img) {
   });
   ogImage = new URL(result.src, Astro.site).href;
 }
-const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+const excerpt = plainTextFromHtml(post.excerpt.rendered);
 ---
 
 <BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={ogImage} noindex={!isPublic}>

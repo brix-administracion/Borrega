@@ -1,5 +1,42 @@
 import { parse, type HTMLElement } from 'node-html-parser';
 
+// WordPress devuelve los extractos con las comillas y guiones tipograficos
+// como entidades (&#8216;usan IA&#8217;, &#8211;, &hellip;). Si eso se pinta
+// como texto plano se leen los codigos en crudo, que es lo que pasaba en las
+// tarjetas del blog. Solo las que emite WP de verdad: no hace falta la tabla
+// completa de HTML.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  hellip: '…',
+  mdash: '—',
+  ndash: '–',
+  lsquo: '‘',
+  rsquo: '’',
+  ldquo: '“',
+  rdquo: '”',
+};
+
+/**
+ * Pasa un fragmento de HTML de WordPress a texto plano legible: saca las
+ * etiquetas, decodifica las entidades y normaliza los espacios. Para
+ * extractos y metadescripciones, donde el resultado NO se interpreta como
+ * HTML.
+ */
+export function plainTextFromHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&([a-z]+);/gi, (match, name) => NAMED_ENTITIES[name.toLowerCase()] ?? match)
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // El HTML que devuelve WordPress (content.rendered) viene envuelto en la
 // estructura de contenedores de Elementor (secciones/columnas/widgets) que
 // no tiene sentido migrar tal cual porque depende del runtime/CSS de

@@ -2,9 +2,9 @@
 // Cuerpo del post (HTML de WordPress ya limpio) con la tipografia del sitio.
 // Lo comparten las plantillas de trabajo y de blog, que van sobre fondos
 // distintos: el blog sobre el fondo oscuro del sitio y el trabajo sobre claro,
-// como en la plantilla original de WordPress. Por eso los colores salen de dos
-// custom properties que hereda del contenedor; los valores por defecto son los
-// del blog, asi que esa plantilla no cambia.
+// como en los originales de WordPress. Por eso los colores salen de custom
+// properties que hereda del contenedor; el default es el del blog y la
+// plantilla de trabajo lo pisa.
 ---
 
 <div class="post-content" data-reveal>
@@ -12,15 +12,10 @@
 </div>
 
 <style>
-  /* La barra de acento a la izquierda es del blog. La plantilla de trabajo la
-     apaga poniendo --post-body-rule en transparent y el padding en 0, porque
-     el original no la tiene. */
-  .post-content {
-    border-left: 2px solid var(--post-body-rule, var(--color-accent));
-    padding-left: var(--post-body-indent, var(--space-3));
-  }
+  /* Sin barra de acento ni sangria: ninguna de las dos plantillas originales
+     las tiene (medido, el borde izquierdo del cuerpo es 0px en las dos). */
   .post-content :global(p) {
-    color: var(--post-body-text, rgba(255, 255, 255, 0.85));
+    color: var(--post-body-text, #fff);
     margin-bottom: var(--space-2);
   }
   .post-content :global(h2) {
@@ -33,7 +28,7 @@
   }
   .post-content :global(ul),
   .post-content :global(ol) {
-    color: var(--post-body-text, rgba(255, 255, 255, 0.85));
+    color: var(--post-body-text, #fff);
     padding-left: 1.4rem;
     margin-bottom: var(--space-2);
   }

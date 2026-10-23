@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import GradientHero from '../components/GradientHero.astro';
 import { getImage } from 'astro:assets';
 import { getBlogPosts, featuredImageOf, tileImageOf, postPath } from '../lib/wp';
+import { plainTextFromHtml } from '../lib/cleanContent';
 
 const posts = await getBlogPosts();
 
@@ -49,7 +50,7 @@ await Promise.all(
         {posts.map((post) => {
           const img = featuredImageOf(post);
           const thumb = optimized.get(post.id);
-          const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          const excerpt = plainTextFromHtml(post.excerpt.rendered);
           return (
             <li class="blog-card" data-reveal>
               <a href={postPath(post)} class="blog-card-link">
@@ -82,49 +83,55 @@ await Promise.all(
     color: var(--color-white);
     padding-block: var(--space-5);
   }
+  /* Medidas tomadas del listado original con getComputedStyle, no estimadas:
+     separacion 20px horizontal y 25px vertical, tarjeta de borde #f0f0f0 sin
+     redondeo y 10px de padding, miniatura cuadrada de 348px, titulo de 21px
+     con 20px de aire abajo, extracto de 14px y "Leer más" de 12px/600. */
   .blog-grid {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: var(--space-3);
+    column-gap: 20px;
+    row-gap: 25px;
   }
   .blog-card {
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: var(--radius-md);
-    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    padding: 10px;
   }
   .blog-card-link {
     display: block;
     color: inherit;
     height: 100%;
   }
+  /* `height: auto` es imprescindible: sin el, el atributo height del <img>
+     (que lleva las medidas reales para reservar el espacio) le gana al
+     aspect-ratio y la miniatura sale con el alto del original. */
   .blog-card img {
+    display: block;
     width: 100%;
-    aspect-ratio: 3 / 2;
+    height: auto;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
   .blog-card-body {
-    padding: var(--space-3);
+    padding: var(--space-2) 30px var(--space-2) 0;
   }
   .blog-card-body h2 {
-    font-size: 1.3rem;
-    margin-bottom: var(--space-1);
+    font-size: 21px;
+    margin-bottom: 20px;
   }
+  /* El extracto va entero: el original no lo recorta. */
   .blog-card-body p {
-    font-size: 0.92rem;
-    color: rgba(255, 255, 255, 0.75);
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 14px;
+    color: #f0f0f0;
   }
   .read-more {
     display: inline-block;
     margin-top: var(--space-2);
     color: var(--color-accent);
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 12px;
   }
   .blog-card:hover .read-more { text-decoration: underline; }
 

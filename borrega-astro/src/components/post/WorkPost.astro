@@ -216,12 +216,9 @@ const related = works.filter((p) => p.id !== post.id).slice(0, 3);
     background: var(--color-white);
     color: #1b1b1b;
     padding-block: var(--space-5) var(--space-4);
-    /* Las lee PostBody, que por defecto pinta para fondo oscuro (el blog).
-       La barra de acento se apaga: el original no la tiene en el trabajo. */
-    --post-body-text: rgba(27, 27, 27, 0.85);
+    /* Las lee PostBody, que por defecto pinta para fondo oscuro (el blog). */
+    --post-body-text: #1b1b1b;
     --post-body-quote: rgba(27, 27, 27, 0.7);
-    --post-body-rule: transparent;
-    --post-body-indent: 0;
     /* Alto del header sticky, medido en el navegador (73,9px). Si el header
        cambia de alto hay que ajustarlo aca. */
     --work-header-clearance: 74px;

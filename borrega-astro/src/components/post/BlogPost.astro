@@ -78,10 +78,23 @@ const related = (await getBlogPosts()).filter((p) => p.id !== post.id).slice(0, 
   .post-grid { display: grid; gap: var(--space-4); }
   .signature { margin-top: var(--space-4); }
 
+  /* Medido sobre el post original: el cuerpo va justificado, en blanco puro y
+     con interlineado 24px sobre 16px de texto. */
+  .post :global(.post-content p),
+  .post :global(.post-content li) {
+    text-align: justify;
+    line-height: 24px;
+  }
+
+  /* `height: auto` es imprescindible: sin el, el atributo height del <img>
+     (que lleva las medidas reales para reservar el espacio) le gana al
+     aspect-ratio y la destacada sale con el alto del original. En el post
+     original es cuadrada y sin redondeo. */
   .post-featured {
+    display: block;
     width: 100%;
-    border-radius: var(--radius-md);
-    aspect-ratio: 4 / 3;
+    height: auto;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
 
@@ -98,7 +111,9 @@ const related = (await getBlogPosts()).filter((p) => p.id !== post.id).slice(0, 
     top: -20px;
     left: var(--space-3);
   }
-  .cta-card h2 { font-size: 1.4rem; }
+  /* 48px es el tamaño del titular en el original; cae con el ancho para que no
+     desborde en la columna angosta. */
+  .cta-card h2 { font-size: clamp(1.75rem, 4.2vw, 48px); line-height: 1.1; }
   .accent-pink { color: var(--color-pink); }
   .cta-card p {
     color: rgba(255, 255, 255, 0.75);
@@ -119,8 +134,9 @@ const related = (await getBlogPosts()).filter((p) => p.id !== post.id).slice(0, 
   }
   .back-link { color: var(--color-white); font-weight: 600; }
 
+  /* 60/40, el reparto declarado en el original (--width:60% y 40%). */
   @media (min-width: 900px) {
-    .post-grid { grid-template-columns: 2fr 1fr; align-items: start; }
+    .post-grid { grid-template-columns: 60fr 40fr; align-items: start; }
     .post-sidebar { position: sticky; top: calc(var(--space-3) + 70px); }
   }
 </style>
