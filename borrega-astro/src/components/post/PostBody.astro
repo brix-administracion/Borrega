@@ -1,6 +1,10 @@
 ---
 // Cuerpo del post (HTML de WordPress ya limpio) con la tipografia del sitio.
-// Lo comparten las plantillas de trabajo y de blog.
+// Lo comparten las plantillas de trabajo y de blog, que van sobre fondos
+// distintos: el blog sobre el fondo oscuro del sitio y el trabajo sobre claro,
+// como en la plantilla original de WordPress. Por eso los colores salen de dos
+// custom properties que hereda del contenedor; los valores por defecto son los
+// del blog, asi que esa plantilla no cambia.
 ---
 
 <div class="post-content" data-reveal>
@@ -8,9 +12,15 @@
 </div>
 
 <style>
-  .post-content { border-left: 2px solid var(--color-accent); padding-left: var(--space-3); }
+  /* La barra de acento a la izquierda es del blog. La plantilla de trabajo la
+     apaga poniendo --post-body-rule en transparent y el padding en 0, porque
+     el original no la tiene. */
+  .post-content {
+    border-left: 2px solid var(--post-body-rule, var(--color-accent));
+    padding-left: var(--post-body-indent, var(--space-3));
+  }
   .post-content :global(p) {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--post-body-text, rgba(255, 255, 255, 0.85));
     margin-bottom: var(--space-2);
   }
   .post-content :global(h2) {
@@ -23,7 +33,7 @@
   }
   .post-content :global(ul),
   .post-content :global(ol) {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--post-body-text, rgba(255, 255, 255, 0.85));
     padding-left: 1.4rem;
     margin-bottom: var(--space-2);
   }
@@ -32,6 +42,6 @@
     border-left: 3px solid var(--color-accent);
     padding-left: var(--space-2);
     font-style: italic;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--post-body-quote, rgba(255, 255, 255, 0.7));
   }
 </style>

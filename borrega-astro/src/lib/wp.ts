@@ -416,6 +416,14 @@ export function softwareOf(post: WPPost, media: Map<number, WPMedia>): WPMedia[]
   return resolveInOrder(idListOf(acfOf(post).software), media);
 }
 
+// Imagen de portada del trabajo: es la que la plantilla original usa de fondo
+// del hero. NO es la featured image del post (en recursos-humanos-bfr la
+// featured es Bruchou-RH_brand-4-copia y el cover es conectamos@3x).
+export function coverOf(post: WPPost, media: Map<number, WPMedia>): WPMedia | undefined {
+  const cover = acfOf(post).cover;
+  return typeof cover === 'number' && cover > 0 ? media.get(cover) : undefined;
+}
+
 // String vacio (o solo espacios) -> undefined.
 export function projectLinkOf(post: WPPost): string | undefined {
   const link = acfOf(post).link;
