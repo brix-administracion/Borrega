@@ -116,6 +116,19 @@ export interface WPMedia {
   media_details?: WPMediaDetails;
 }
 
+// Campos ACF del field group "Single Project" (Show in REST API activado).
+// Los de imagen llegan como IDs de media, no como objetos ni URLs. Cuando un
+// campo esta vacio ACF a veces devuelve "" en vez de [] o 0, asi que todos
+// los tipos toleran el string vacio.
+export interface WPProjectFields {
+  galeria_proyecto?: number[] | '';
+  software?: number[] | '';
+  cover?: number | '';
+  /** Se tipa por completitud; la bandera se resuelve por categorias (countryOf). */
+  pais?: number | '';
+  link?: string;
+}
+
 export interface WPPost {
   id: number;
   slug: string;
@@ -125,6 +138,8 @@ export interface WPPost {
   excerpt: WPRendered;
   featured_media: number;
   categories: number[];
+  /** Los posts de blog devuelven `[]` en vez de un objeto. */
+  acf?: WPProjectFields | [];
   _embedded?: {
     'wp:featuredmedia'?: WPMedia[];
     'wp:term'?: Array<Array<{ id: number; name: string; slug: string }>>;
@@ -325,4 +340,84 @@ export function countryOf(post: WPPost, countries: WPCategory[]): WPCountry | un
   const iso = COUNTRY_ISO[match.slug];
   if (!iso) return undefined;
   return { slug: match.slug, name: match.name, iso };
+}
+
+// ---------------------------------------------------------------------------
+// Campos ACF de los trabajos y resolucion de sus imagenes
+// ACF devuelve IDs de media. Resolverlos uno por uno costaria un pedido por
+// imagen; en bloque son 2 pedidos para todo el sitio (154 ids, 100 por lote).
+
+// Normaliza `acf`, que puede venir undefined, [] (blog) o un objeto.
+function acfOf(post: WPPost): WPProjectFields {
+  const acf = post.acf;
+  return acf && !Array.isArray(acf) ? acf : {};
+}
+
+// Acepta number[], "" y undefined; descarta lo que no sea un id valido.
+function idListOf(value: unknown): number[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((id): id is number => typeof id === 'number' && id > 0);
+}
+
+const MEDIA_BATCH_SIZE = 100; // maximo de `include` en la REST API de WP
+
+// Resuelve ids de media en bloque. Devuelve un Map para lookup O(1). Un id
+// que WordPress no devuelve (borrado) simplemente no esta en el Map.
+// Memoizado por el conjunto de ids (ordenado y sin repetidos): llamar siempre
+// con el mismo conjunto, como hace getWorkMedia, cuesta los pedidos una vez.
+export function getMediaByIds(ids: number[]): Promise<Map<number, WPMedia>> {
+  const unique = [...new Set(ids.filter((id) => Number.isInteger(id) && id > 0))].sort((a, b) => a - b);
+  return once(`media:${unique.join(',')}`, async () => {
+    const batches: number[][] = [];
+    for (let i = 0; i < unique.length; i += MEDIA_BATCH_SIZE) {
+      batches.push(unique.slice(i, i + MEDIA_BATCH_SIZE));
+    }
+    const results = await Promise.all(
+      batches.map((batch) =>
+        wpFetch<WPMedia[]>(
+          `/media?include=${batch.join(',')}&per_page=${MEDIA_BATCH_SIZE}&_fields=id,source_url,alt_text,media_details`,
+        ),
+      ),
+    );
+    return new Map(results.flat().map((media) => [media.id, media] as const));
+  });
+}
+
+// Junta los ids de TODOS los trabajos (galeria, software y cover) y los
+// resuelve de una vez. Se eligio juntarlos aca y no por pagina de detalle:
+// asi todo el build cuesta 2 pedidos en total, en vez de 2 por cada uno de
+// los 20 trabajos (40 pedidos). Las paginas llaman a esta funcion sin
+// argumentos y comparten la misma promesa memoizada.
+export async function getWorkMedia(): Promise<Map<number, WPMedia>> {
+  const posts = await getWorkPosts();
+  const ids = posts.flatMap((post) => {
+    const acf = acfOf(post);
+    return [
+      ...idListOf(acf.galeria_proyecto),
+      ...idListOf(acf.software),
+      ...idListOf([acf.cover]),
+    ];
+  });
+  return getMediaByIds(ids);
+}
+
+// Devuelve los medias en el ORDEN del array de ACF (el que armo la clienta).
+// La respuesta de /media viene por id descendente, asi que nunca se usa su
+// orden. Los ids que no resuelven se saltean en silencio.
+function resolveInOrder(ids: number[], media: Map<number, WPMedia>): WPMedia[] {
+  return ids.map((id) => media.get(id)).filter((m): m is WPMedia => m !== undefined);
+}
+
+export function galleryOf(post: WPPost, media: Map<number, WPMedia>): WPMedia[] {
+  return resolveInOrder(idListOf(acfOf(post).galeria_proyecto), media);
+}
+
+export function softwareOf(post: WPPost, media: Map<number, WPMedia>): WPMedia[] {
+  return resolveInOrder(idListOf(acfOf(post).software), media);
+}
+
+// String vacio (o solo espacios) -> undefined.
+export function projectLinkOf(post: WPPost): string | undefined {
+  const link = acfOf(post).link;
+  return typeof link === 'string' && link.trim() ? link.trim() : undefined;
 }
