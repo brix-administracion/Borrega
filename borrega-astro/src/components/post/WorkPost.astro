@@ -222,12 +222,28 @@ const related = works.filter((p) => p.id !== post.id).slice(0, 3);
     --post-body-quote: rgba(27, 27, 27, 0.7);
     --post-body-rule: transparent;
     --post-body-indent: 0;
+    /* Alto del header sticky, medido en el navegador (73,9px). Si el header
+       cambia de alto hay que ajustarlo aca. */
+    --work-header-clearance: 74px;
   }
   .work-columns {
     display: grid;
     grid-template-columns: 65fr 35fr;
     gap: var(--space-4);
     align-items: start;
+  }
+
+  /* La ficha acompaña el scroll mientras la galeria, que suele ser mucho mas
+     larga, sigue de largo. En el original es un sticky de Elementor con
+     sticky_parent, o sea acotado a la fila y no a la pagina: `position:
+     sticky` dentro del grid hace exactamente eso, y se despega solo cuando la
+     galeria termina. Depende de `align-items: start` de arriba — si la columna
+     se estirara a lo alto de la fila, no habria recorrido donde pegarse.
+     El offset deja libre el header, que tambien es sticky. */
+  .work-info {
+    position: sticky;
+    top: calc(var(--work-header-clearance) + var(--space-2));
+    align-self: start;
   }
 
   .work-info-head {
@@ -307,5 +323,8 @@ const related = works.filter((p) => p.id !== post.id).slice(0, 3);
   @media (max-width: 900px) {
     .work-columns { grid-template-columns: 1fr; }
     .work-hero { min-height: 340px; }
+    /* Apiladas, la ficha ocupa su propia fila y no tiene recorrido donde
+       pegarse; dejarla sticky solo la haria saltar contra el header. */
+    .work-info { position: static; }
   }
 </style>
