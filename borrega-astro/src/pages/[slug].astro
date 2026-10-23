@@ -2,17 +2,18 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { getAllPages } from '../lib/wp';
 import { cleanElementorHtml } from '../lib/cleanContent';
-import { EXCLUDED_SLUGS as EXCLUDED_SLUGS_LIST } from '../lib/pageSlugs';
+import { ALLOWED_PAGE_SLUGS } from '../lib/pageSlugs';
 
 export async function getStaticPaths() {
-  // Paginas que NO se generan con esta plantilla generica porque tienen
-  // tratamiento especial en otro lado (home) o no son contenido publico
-  // real (pagina de pruebas internas). Lista compartida con sitemap.xml.ts
-  // en src/lib/pageSlugs.ts para no duplicarla ni que se desincronicen.
-  const EXCLUDED_SLUGS = new Set(EXCLUDED_SLUGS_LIST);
+  // Allowlist: solo las paginas de WP listadas en src/lib/pageSlugs.ts se
+  // generan con esta plantilla generica. Todo lo demas que haya o aparezca
+  // en WordPress se ignora a proposito — el diseño vive en Astro y WP es
+  // deposito del blog y los trabajos nada mas. Lista compartida con
+  // sitemap.xml.ts para no duplicarla ni que se desincronicen.
+  const ALLOWED = new Set(ALLOWED_PAGE_SLUGS);
   const pages = await getAllPages();
   return pages
-    .filter((p) => !EXCLUDED_SLUGS.has(p.slug))
+    .filter((p) => ALLOWED.has(p.slug))
     .map((p) => ({
       params: { slug: p.slug },
       props: { page: p },

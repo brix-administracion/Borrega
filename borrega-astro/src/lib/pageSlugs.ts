@@ -1,24 +1,20 @@
-// Lista compartida de slugs de WordPress que NO se generan con la
-// plantilla generica (src/pages/[slug].astro) porque tienen tratamiento
-// especial en otro lado, o no son contenido publico real.
-// La usan tanto [slug].astro (para excluirlas del build generico) como
-// sitemap.xml.ts (para no listarlas / no duplicarlas).
-export const EXCLUDED_SLUGS = [
-  'home-2', // version vieja de la home, ya reemplazada
-  'borrega-blog', // tiene su propia pagina (listado de blog)
-  'nuestro-trabajo', // listado de proyectos a medida (lee posts de WP)
-  'assist-testing-borrega', // pagina de pruebas interna, no es contenido publico
-  'contacto', // pagina a medida
-  'externalizacion-servicios', // landing de servicio a medida
-  'auditoria-comunicacion', // landing de servicio a medida
-  'auditoria-redes-sociales', // landing de servicio a medida
-  'servicios-multidisciplinarios', // landing de servicio a medida
-  'branding', // portfolio a medida
-  'diseno-web', // portfolio a medida
-  'fotografia', // portfolio a medida
-  'animacion-2d-y-3d', // portfolio a medida
-  'portfolio-redes-sociales', // portfolio a medida
-  'reservar-consulta', // pagina a medida (CTAs)
-  'sumate', // formulario a medida (Web3Forms)
-  'form-kickoff', // herramienta interna a medida, noindex
+// Allowlist de slugs de WordPress que SI se generan con la plantilla
+// generica (src/pages/[slug].astro). La usan tanto [slug].astro como
+// sitemap.xml.ts, para no duplicarla ni que se desincronicen.
+//
+// Es una allowlist a proposito, no una lista de exclusiones. WordPress
+// quedo como deposito de contenido de dos cosas y nada mas: el blog y los
+// trabajos (ambos son posts, no paginas). El diseño del sitio vive en
+// Astro. Con una blocklist, cualquier pagina nueva que la clienta cree en
+// WP entraba sola al sitio y al sitemap, y entraba mal: la plantilla
+// generica es una extraccion semantica (ver cleanElementorHtml) que
+// descarta todo el layout de Elementor. Con una allowlist, una pagina
+// nueva no aparece hasta que alguien la agrega aca a mano y le revisa como
+// se ve.
+//
+// Agregar un slug aca implica aceptar que su contenido se publique tal
+// como lo deje la extraccion semantica. Si una pagina necesita diseño
+// propio, va como pagina a medida en src/pages/ y NO entra a esta lista.
+export const ALLOWED_PAGE_SLUGS = [
+  'politicas-de-privacidad', // texto legal corrido, la extraccion generica alcanza
 ];
