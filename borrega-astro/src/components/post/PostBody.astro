@@ -1,0 +1,37 @@
+---
+// Cuerpo del post (HTML de WordPress ya limpio) con la tipografia del sitio.
+// Lo comparten las plantillas de trabajo y de blog.
+---
+
+<div class="post-content" data-reveal>
+  <slot />
+</div>
+
+<style>
+  .post-content { border-left: 2px solid var(--color-accent); padding-left: var(--space-3); }
+  .post-content :global(p) {
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: var(--space-2);
+  }
+  .post-content :global(h2) {
+    font-size: 1.5rem;
+    margin-top: var(--space-4);
+  }
+  .post-content :global(h3) {
+    font-size: 1.2rem;
+    margin-top: var(--space-3);
+  }
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    color: rgba(255, 255, 255, 0.85);
+    padding-left: 1.4rem;
+    margin-bottom: var(--space-2);
+  }
+  .post-content :global(li) { margin-bottom: 0.4rem; }
+  .post-content :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-2);
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+  }
+</style>
