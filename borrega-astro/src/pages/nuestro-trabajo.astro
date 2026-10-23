@@ -1,10 +1,41 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GradientHero from '../components/GradientHero.astro';
-import { getWorkPosts, featuredImageOf, postPath } from '../lib/wp';
+import { getImage } from 'astro:assets';
+import { getWorkPosts, featuredImageOf, tileImageOf, postPath } from '../lib/wp';
 
 // Listado completo de proyectos ("Nuestro trabajo") leido en vivo de WordPress.
 const works = await getWorkPosts();
+
+// Ancho de la miniatura: la tarjeta cuadrada mide como maximo ~335px (tres
+// columnas justo antes del corte de 1100px; en otros anchos es menos). 640px
+// cubre eso en retina sin pedir el original de WordPress.
+const WORK_IMAGE_PX = 640;
+
+// Una optimizacion por proyecto con getImage() y no con <Image>: el patron y la
+// razon (descargas repetidas, inferSize prohibido) estan en DomeGallery.astro.
+// Sin `fit`: sharp redimensiona por ancho y respeta el aspecto real; si WP no
+// dio medidas se usa un aspecto de referencia en vez de inferSize.
+const optimized = new Map<number, { src: string; width: number; height: number }>();
+await Promise.all(
+  works.map(async (post) => {
+    const media = featuredImageOf(post);
+    if (!media) return;
+    const item = tileImageOf(media);
+    const result = await getImage({
+      src: item.src,
+      width: WORK_IMAGE_PX,
+      height: Math.round(((item.height ?? 2) / (item.width ?? 3)) * WORK_IMAGE_PX),
+      format: 'webp',
+      quality: 72,
+    });
+    optimized.set(post.id, {
+      src: result.src,
+      width: Number(result.attributes.width ?? WORK_IMAGE_PX),
+      height: Number(result.attributes.height ?? WORK_IMAGE_PX),
+    });
+  }),
+);
 ---
 
 <BaseLayout title="Nuestro trabajo — Börrega Studio" description="Casos y proyectos de Börrega Studio.">
@@ -18,12 +49,13 @@ const works = await getWorkPosts();
       <ul class="works-grid">
         {works.map((post) => {
           const img = featuredImageOf(post);
+          const thumb = optimized.get(post.id);
           const plainTitle = post.title.rendered.replace(/<[^>]+>/g, '');
           return (
             <li class="work-card" data-reveal>
               <a href={postPath(post)} class="work-link" aria-label={plainTitle}>
-                {img && (
-                  <img src={img.source_url} alt={img.alt_text || plainTitle} loading="lazy" width="600" height="600" />
+                {img && thumb && (
+                  <img src={thumb.src} alt={img.alt_text || plainTitle} loading="lazy" width={thumb.width} height={thumb.height} />
                 )}
                 <span class="work-caption" set:html={post.title.rendered} />
               </a>

@@ -1,7 +1,8 @@
 ---
+import { getImage } from 'astro:assets';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import GradientHero from '../../../../components/GradientHero.astro';
-import { getAllPosts, getBlogCategoryId, isPublicBlogPost, featuredImageOf, postPath } from '../../../../lib/wp';
+import { getAllPosts, getBlogCategoryId, isPublicBlogPost, featuredImageOf, tileImageOf, postPath } from '../../../../lib/wp';
 import { cleanElementorHtml } from '../../../../lib/cleanContent';
 
 export async function getStaticPaths() {
@@ -27,10 +28,62 @@ const { post, isPublic } = Astro.props;
 const img = featuredImageOf(post);
 const content = cleanElementorHtml(post.content.rendered);
 const title = post.title.rendered;
+
+// Ancho de la imagen destacada: en escritorio la barra lateral mide ~405px y en
+// pantallas angostas la imagen ocupa una columna de hasta ~835px. 840px cubre
+// ambos casos sin pedir el original de WordPress (el de playstation-arg es un
+// PNG de 13 MB).
+const FEATURED_IMAGE_PX = 840;
+
+// getImage() y no <Image>, sin inferSize ni `fit`: ver DomeGallery.astro. Si WP
+// no dio medidas se usa un aspecto de referencia en vez de bajar el original.
+let featured: { src: string; width: number; height: number } | undefined;
+if (img) {
+  const item = tileImageOf(img);
+  const result = await getImage({
+    src: item.src,
+    width: FEATURED_IMAGE_PX,
+    height: Math.round(((item.height ?? 3) / (item.width ?? 4)) * FEATURED_IMAGE_PX),
+    format: 'webp',
+    quality: 72,
+  });
+  featured = {
+    src: result.src,
+    width: Number(result.attributes.width ?? FEATURED_IMAGE_PX),
+    height: Number(result.attributes.height ?? FEATURED_IMAGE_PX),
+  };
+}
+
+// og:image la leen scrapers externos (WhatsApp, LinkedIn, Twitter, Slack) y no
+// un navegador, asi que no comparte la imagen del articulo: va aparte.
+//
+// - JPEG y no webp: es el unico formato que aceptan todos. LinkedIn en
+//   particular lo viene manejando mal, y es justo donde se comparte el trabajo
+//   de una agencia.
+// - 1200px es el ancho que recomienda Open Graph para la preview grande; por
+//   debajo de 600 varias plataformas caen a una miniatura.
+// - URL absoluta: el layout emite og:image tal cual, una relativa se rompe.
+//
+// Antes se mandaba el original de WordPress, que para playstation-arg son 13 MB
+// de PNG: ningun scraper lo previsualizaba.
+const OG_IMAGE_PX = 1200;
+
+let ogImage = img?.source_url;
+if (img) {
+  const item = tileImageOf(img);
+  const result = await getImage({
+    src: item.src,
+    width: OG_IMAGE_PX,
+    height: Math.round(((item.height ?? 630) / (item.width ?? 1200)) * OG_IMAGE_PX),
+    format: 'jpeg',
+    quality: 78,
+  });
+  ogImage = new URL(result.src, Astro.site).href;
+}
 const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 ---
 
-<BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={img?.source_url} noindex={!isPublic}>
+<BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={ogImage} noindex={!isPublic}>
   <GradientHero>
     <Fragment set:html={title} />
   </GradientHero>
@@ -43,8 +96,8 @@ const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, ' ').replace(/\s+/g, '
       </div>
 
       <aside class="post-sidebar">
-        {img && (
-          <img class="post-featured" src={img.source_url} alt={img.alt_text || ''} width="600" height="450" loading="eager" />
+        {img && featured && (
+          <img class="post-featured" src={featured.src} alt={img.alt_text || ''} width={featured.width} height={featured.height} loading="eager" />
         )}
         <div class="cta-card">
           <img src="/images/deco/ok.png" alt="" class="cta-deco" width="40" height="58" />

@@ -1,9 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GradientHero from '../components/GradientHero.astro';
-import { getBlogPosts, featuredImageOf, postPath } from '../lib/wp';
+import { getImage } from 'astro:assets';
+import { getBlogPosts, featuredImageOf, tileImageOf, postPath } from '../lib/wp';
 
 const posts = await getBlogPosts();
+
+// Ancho de la miniatura: la tarjeta mide como maximo ~650px (una columna, justo
+// antes del corte de 700px; en escritorio son ~400px). 800px cubre eso en 1x y
+// el caso comun de escritorio en retina, sin pedir el original de WordPress.
+const CARD_IMAGE_PX = 800;
+
+// Una optimizacion por post con getImage() y no con <Image>: el patron y la
+// razon (descargas repetidas, inferSize prohibido) estan en DomeGallery.astro.
+// Sin `fit`: sharp redimensiona por ancho y respeta el aspecto real; si WP no
+// dio medidas se usa un aspecto de referencia en vez de inferSize.
+const optimized = new Map<number, { src: string; width: number; height: number }>();
+await Promise.all(
+  posts.map(async (post) => {
+    const media = featuredImageOf(post);
+    if (!media) return;
+    const item = tileImageOf(media);
+    const result = await getImage({
+      src: item.src,
+      width: CARD_IMAGE_PX,
+      height: Math.round(((item.height ?? 2) / (item.width ?? 3)) * CARD_IMAGE_PX),
+      format: 'webp',
+      quality: 72,
+    });
+    optimized.set(post.id, {
+      src: result.src,
+      width: Number(result.attributes.width ?? CARD_IMAGE_PX),
+      height: Number(result.attributes.height ?? CARD_IMAGE_PX),
+    });
+  }),
+);
 ---
 
 <BaseLayout title="Blog — Börrega Studio" description="Novedades, conclusiones y temas de interés.">
@@ -17,17 +48,18 @@ const posts = await getBlogPosts();
       <ul class="blog-grid">
         {posts.map((post) => {
           const img = featuredImageOf(post);
+          const thumb = optimized.get(post.id);
           const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
           return (
             <li class="blog-card" data-reveal>
               <a href={postPath(post)} class="blog-card-link">
-                {img && (
+                {img && thumb && (
                   <img
-                    src={img.source_url}
+                    src={thumb.src}
                     alt={img.alt_text || ''}
                     loading="lazy"
-                    width="600"
-                    height="400"
+                    width={thumb.width}
+                    height={thumb.height}
                   />
                 )}
                 <div class="blog-card-body">
