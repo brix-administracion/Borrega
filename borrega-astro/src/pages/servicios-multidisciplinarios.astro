@@ -4,7 +4,6 @@ import ServiceHero from '../components/service/ServiceHero.astro';
 import IntroStatement from '../components/service/IntroStatement.astro';
 import FeatureColumns from '../components/service/FeatureColumns.astro';
 import ProcessSteps from '../components/service/ProcessSteps.astro';
-import Checklist from '../components/service/Checklist.astro';
 import FAQAccordion from '../components/service/FAQAccordion.astro';
 import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
 ---
@@ -20,14 +19,21 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
   />
 
   <IntroStatement
-    eyebrowHtml="Muchas marcas crecen sin una <span class='hl-purple'>estrategia clara</span> de comunicación. Contratan servicios aislados, producen contenido sin dirección y terminan tomando decisiones reactivas que no construyen valor a largo plazo. Cuando la comunicación se fragmenta, la marca pierde fuerza, coherencia y eficiencia."
+    headingHtml="Muchas marcas crecen sin una <span class='hl-purple'>estrategia clara</span> de comunicación."
+    eyebrowHtml="Contratan servicios aislados, producen contenido sin dirección y terminan tomando decisiones reactivas que no construyen valor a largo plazo. Cuando la comunicación se fragmenta, la marca pierde fuerza, coherencia y eficiencia."
     conclusionHtml="Börrega Core es nuestro <span class='hl'>servicio de comunicación integral.</span>"
+    conclusionBodyHtml="Trabajamos con un enfoque multidisciplinario que combina <strong>estrategia, creatividad e implementación</strong> desde un mismo equipo. Acompañamos marcas bajo modalidad <strong>fee mensual</strong> o <strong>por proyecto</strong>, adaptándonos a cada etapa del negocio. Pensamos, diseñamos y ejecutamos soluciones que funcionan en el mundo real."
+    closingHtml="<strong>No entregamos piezas sueltas: construimos sistemas de comunicación alineados al negocio.</strong>"
   />
 
+  {/* El original trae una 7ma tarjeta ("Estrategia de marca y comunicación" repetida, sola en una
+      tercera fila con celdas vacias): es un resto de edicion en WordPress. Se omite a proposito;
+      no la "restaures". */}
   <FeatureColumns
     columns={[
       {
         heading: 'Qué incluye',
+        layout: 'grid',
         items: [
           'Estrategia de marca y comunicación',
           'Branding e identidad visual',
@@ -51,9 +57,11 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
   />
 
   <FeatureColumns
+    heading="¿Es para vos?"
     columns={[
       {
         heading: 'Es para vos si…',
+        headingLevel: 3,
         items: [
           'Necesitás un partner estratégico, no solo ejecución',
           'Buscás coherencia y visión a largo plazo',
@@ -62,6 +70,7 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
       },
       {
         heading: 'No es para vos si…',
+        headingLevel: 3,
         items: [
           'Buscás soluciones aisladas sin estrategia',
           'Necesitás solo una pieza puntual sin contexto',

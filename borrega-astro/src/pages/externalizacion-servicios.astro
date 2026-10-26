@@ -32,7 +32,17 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
     ]}
   />
 
-  <IntroStatement eyebrowHtml="<strong>Cómo trabajamos</strong><br/>Creamos un presupuesto personalizado combinando diferentes servicios según las necesidades reales de tu empresa. El resultado es un equipo de comunicación externo que trabaja de forma continua, integrada y estratégica. Nos involucramos como parte del equipo: escuchamos, asesoramos y trabajamos codo a codo." />
+  {/* "Cómo trabajamos" es un h2 en el original, con tres parrafos debajo. Venia
+      todo fusionado en un solo parrafo con el titulo en negrita, y por eso
+      faltaba del esquema de titulos de la pagina. */}
+  <IntroStatement
+    headingHtml="Cómo trabajamos"
+    eyebrowHtml={[
+      'Creamos un presupuesto personalizado combinando diferentes servicios según las necesidades reales de tu empresa.',
+      'El resultado es un <strong>equipo de comunicación externo</strong> que trabaja de forma continua, integrada y estratégica.',
+      'Nos involucramos como parte del equipo: escuchamos, asesoramos y trabajamos codo a codo.',
+    ]}
+  />
 
   <FeatureColumns
     columns={[

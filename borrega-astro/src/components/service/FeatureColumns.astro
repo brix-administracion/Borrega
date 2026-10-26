@@ -1,22 +1,41 @@
 ---
 interface Column {
+  /** Ancla opcional para enlaces internos (#id). */
+  id?: string;
   heading: string;
-  intro?: string;
+  /** Un parrafo, o varios cuando el original los separa. */
+  intro?: string | string[];
   items: string[];
+  /** 'grid': items en cuadricula de 3 columnas (desktop) en vez de una sola columna. */
+  layout?: 'list' | 'grid';
+  /**
+   * Nivel del titulo de la columna. Por defecto h2, que es lo que son en los
+   * originales ("Que incluye", "Entregable", "Diagnostico estrategico"). Se pasa
+   * 3 cuando la columna es una tarjeta bajo un h2 de seccion: ahi el original
+   * usa un parrafo, no un encabezado, y dos h2 hermanos romperian el esquema.
+   */
+  headingLevel?: 2 | 3;
 }
 interface Props {
   columns: Column[];
+  /** h2 opcional sobre todas las columnas (ej. "¿Es para vos?"). */
+  heading?: string;
 }
-const { columns } = Astro.props;
+const { columns, heading } = Astro.props;
 ---
 
 <section class="feature-columns">
+  {heading && (
+    <div class="container">
+      <h2 class="section-heading" data-reveal>{heading}</h2>
+    </div>
+  )}
   <div class="container cols-grid">
     {columns.map((col) => (
-      <div class="col" data-reveal>
-        <h2>{col.heading}</h2>
-        {col.intro && <p class="intro">{col.intro}</p>}
-        <ul>
+      <div class="col" id={col.id} data-reveal>
+        {col.headingLevel === 3 ? <h3>{col.heading}</h3> : <h2>{col.heading}</h2>}
+        {col.intro && (Array.isArray(col.intro) ? col.intro : [col.intro]).map((para) => <p class="intro">{para}</p>)}
+        <ul class:list={{ 'items-grid': col.layout === 'grid' }}>
           {col.items.map((item) => (
             <li>{item}</li>
           ))}
@@ -40,11 +59,14 @@ const { columns } = Astro.props;
     border-top: 2px dotted var(--color-accent);
     padding-top: var(--space-2);
   }
-  .col h2 {
+  /* h2 y h3 se ven igual: el nivel cambia por semantica, no por diseño. */
+  .col h2,
+  .col h3 {
     font-size: 1.5rem;
     text-align: center;
     margin-bottom: var(--space-2);
   }
+  .section-heading { text-align: center; font-size: 1.5rem; margin-bottom: var(--space-3); }
   .intro { opacity: 0.8; margin-bottom: var(--space-2); }
   .col ul {
     list-style: none;
@@ -61,6 +83,7 @@ const { columns } = Astro.props;
   }
 
   @media (min-width: 900px) {
+    .col ul.items-grid { grid-template-columns: repeat(3, 1fr); }
     .cols-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   }
 </style>

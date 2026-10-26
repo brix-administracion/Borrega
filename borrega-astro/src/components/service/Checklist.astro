@@ -1,15 +1,30 @@
 ---
 interface Props {
   heading?: string;
+  /** h2 opcional sobre todo el bloque (ej. "¿Es para vos?"), aparte del titulo lateral. */
+  sectionHeading?: string;
+  /**
+   * Nivel del titulo lateral. Por defecto h2, que es lo que es en los originales
+   * de auditoria-comunicacion y externalizacion-servicios ("Nuestro servicio ...
+   * es para tu empresa si:"). Se pasa 3 cuando la tarjeta cuelga de un h2 de
+   * seccion, como el "Es para vos si…" de auditoria-redes-sociales: ahi el
+   * original usa un parrafo y dos h2 hermanos romperian el esquema.
+   */
+  headingLevel?: 2 | 3;
   items: string[];
   tone?: 'band' | 'plain';
 }
-const { heading, items, tone = 'band' } = Astro.props;
+const { heading, sectionHeading, headingLevel = 2, items, tone = 'band' } = Astro.props;
 ---
 
 <section class:list={['checklist', `tone-${tone}`]}>
+  {sectionHeading && (
+    <div class="container">
+      <h2 class="section-heading" data-reveal>{sectionHeading}</h2>
+    </div>
+  )}
   <div class="container checklist-grid">
-    {heading && <h2 data-reveal>{heading}</h2>}
+    {heading && (headingLevel === 3 ? <h3 data-reveal>{heading}</h3> : <h2 data-reveal>{heading}</h2>)}
     <ul data-reveal>
       {items.map((item) => (
         <li>
@@ -37,10 +52,14 @@ const { heading, items, tone = 'band' } = Astro.props;
     gap: var(--space-3);
     align-items: start;
   }
-  .checklist h2 {
+  /* El rotulo de la tarjeta es h3 y el de la seccion h2; comparten tamaño
+     porque en el original se ven igual. */
+  .checklist h2,
+  .checklist h3 {
     font-size: 1.5rem;
     max-width: 20ch;
   }
+  .checklist h2.section-heading { max-width: none; text-align: center; margin-bottom: var(--space-3); }
   .checklist ul {
     list-style: none;
     margin: 0;

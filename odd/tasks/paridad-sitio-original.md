@@ -157,18 +157,49 @@ externalizacion.
 
 ### T3 — Secciones y encabezados faltantes
 
-- [ ] `/servicios-multidisciplinarios/`: bloque "Borrega Core es nuestro servicio de
-      comunicacion integral." con su parrafo; cierre "No entregamos piezas sueltas:
-      construimos sistemas de comunicacion alineados al negocio."; encabezado "Es
-      para vos?"; separar intro en encabezado + parrafo; "Que incluye" en grilla 3x2.
-      **No portar** la 7a tarjeta duplicada del original (resto de edicion).
-- [ ] `/auditoria-redes-sociales/`: parrafo bajo "Publicar sin estrategia clara";
-      frase "No es una opinion: es un analisis profesional con criterio de marca y
-      negocio."; encabezados "Valor del servicio" y "Es para vos?"; boton secundario
-      "Que incluye" en el hero. El boton de la caja de precio apunta a `#` en el
-      original (link sin terminar) -> apuntarlo a Calendly.
-- [ ] `/auditoria-comunicacion/`: restaurar "...campanas o redes" y "...o solo de
-      las redes sociales" en los dos items a los que Astro les comio texto.
+- [x] `/servicios-multidisciplinarios/`: bloque "Borrega Core" con su parrafo;
+      cierre "No entregamos piezas sueltas..."; encabezado "Es para vos?"; intro
+      separado en encabezado + parrafo; "Que incluye" en grilla 3x2. La 7a tarjeta
+      duplicada del original NO se porto (resto de edicion), con comentario.
+- [x] `/auditoria-redes-sociales/`: parrafo bajo "Publicar sin estrategia clara";
+      "No es una opinion..."; encabezados "Valor del servicio" y "Es para vos?";
+      boton secundario "Que incluye" en el hero. El boton de la caja de precio
+      apuntaba a `#` en el original -> ahora a `/reservar-consulta`.
+- [x] `/auditoria-comunicacion/`: restaurados los dos items con texto comido.
+- [x] **Extra, encontrado al verificar:** a `/externalizacion-servicios/` le faltaba
+      el h2 "Como trabajamos". Estaba fusionado dentro de un `eyebrowHtml` como
+      `<strong>Como trabajamos</strong><br/>` seguido de los tres parrafos en uno
+      solo. `IntroStatement.eyebrowHtml` acepta ahora `string | string[]`.
+
+**El ratio de texto no alcanza, confirmado dos veces mas.** Esa pagina daba 102% y
+yo la habia dado por cerrada en T2. Comparar el esquema de `<h2>` contra el original
+fue lo que lo encontro. Mismo instrumento encontro que `conclusionHtml` salia como
+`<p>` cuando en los tres originales es un `<h2>` de seccion.
+
+**Niveles de titulo, medidos por pagina (no asumidos):**
+- `conclusionHtml` -> `<h2>`: en los tres originales es encabezado de seccion.
+- `Checklist.heading`: es `<h2>` en auditoria-comunicacion y externalizacion
+  ("Nuestro servicio ... es para tu empresa si:"), pero en auditoria-redes-sociales
+  "Es para vos si…" es un parrafo. Prop `headingLevel` con default 2; esa pagina
+  pasa 3. Mi primer intento lo degrado para todos y rompio dos paginas.
+- `FeatureColumns.column.headingLevel`: default 2 (son h2 en los originales), 3 en
+  las tarjetas "Es para vos si…"/"No es para vos si…" de multidisciplinarios.
+
+**Diferencias deliberadas con el original** (el original esta mal, no lo copiamos):
+- `auditoria-comunicacion` y `externalizacion-servicios` **no tienen ningun `<h1>`**:
+  el titulo del hero es `<h2>`. Astro usa `<h1>`.
+- Esas dos paginas marcan un parrafo entero como `<h2>` ("Cuando una marca comunica
+  sin estrategia integral...", "Muchas empresas necesitan resolver..."). En Astro
+  queda como parrafo.
+
+**Verificado:** esquema de `<h2>` identico al original en las 4 paginas una vez
+excluidas esas diferencias. Grilla medida en el navegador: `417.6px 417.6px 417.6px`
+con 6 items (3x2 real). Ancla `#servicios` resuelve, 0 enlaces muertos. Ratios
+102 / 102 / 103 / 105%. `tsc` exit 0, build 47 paginas.
+
+De paso se saco un import de `Checklist` sin usar que ya venia de `main`.
+
+Commit: `fix(servicios): portar las secciones y encabezados que faltaban`
 
 - Ruta: delegada (3 archivos + componentes de servicio)
 - Checks: build, ratio de las 3 paginas en 95-105%
