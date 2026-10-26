@@ -245,11 +245,59 @@ por columna mas corta. El orden de lectura difiere; es el precio de no sumar una
 libreria de JS.
 
 Commit: `feat(portfolio): masonry, justified y lightbox en las galerias`
-- [ ] `/portfolio-redes-sociales/`: imagen de fondo detras de cada mockup
-      (slideshow de una sola imagen, fade, 5000ms); los posteos abren lightbox.
-- [ ] `/branding/`: grilla de 2 columnas (50/50) por fila, imagenes **debajo** del
-      texto, linea divisoria bajo cada titulo. Los 7 casos y sus 14 imagenes ya
-      coinciden.
+- [x] `/portfolio-redes-sociales/`: fondo detras de cada mockup y lightbox en los
+      posteos.
+- [x] `/branding/`: grilla de 2 columnas (50/50), imagenes **debajo** del texto,
+      linea divisoria bajo cada titulo.
+
+**El "slideshow" no era un slideshow.** El relevamiento decia "background
+slideshow, loop, fade, 5000ms". Al leer la configuracion, **cada uno tiene una sola
+imagen**: con una imagen no anima nunca. Se implemento como `background-image`
+estatico, con comentario explicando por que, para que nadie "restaure" la animacion.
+
+Y la imagen resulto ser **un marco de iPhone vacio** (`001.png`, 1200x933). La
+composicion plana de posteos va centrada encima al 80% del ancho y el cuerpo del
+telefono asoma por detras: el efecto es "estos posteos, en un celular".
+
+Dos trampas al relevarlo:
+- Buscar el fondo en `.elementor-column` da **cero**. Elementor lo inyecta dentro de
+  un swiper, asi que vive en un div hijo. Hay que buscar por *cualquier* elemento
+  cuyo `background-image` contenga el archivo.
+- Habia **7** fondos para 6 tarjetas: el septimo es el de la seccion entera (una
+  foto vertical), no una tarjeta.
+
+Las dos imagenes **no estaban en el repo**. Entran por `astro:assets`
+(`src/assets/images/portfolio/rrss/`), no enlazadas desde borregastudio.com: ese
+acoplamiento es lo que la migracion viene a sacar. Se sirven como WebP optimizado.
+
+El `<dialog>` se extrajo a `src/components/portfolio/Lightbox.astro`, compartido por
+las tres paginas de galeria en vez de duplicar el patron.
+
+**Corregido al verificar:** la fila de posteos estaba limitada a `max-width: 900px`
+mientras la tarjeta mide 1003px. En el original va al ras de la tarjeta
+(tarjeta 200..1203, posteos 210..1193). Ahora 211..1214 = 1003px.
+
+**Medido contra el original, todo coincide:**
+
+| | original | Astro |
+|---|---|---|
+| tarjeta rrss | 1003x776, aspecto 1.2925 | 1003x776, aspecto 1.293 |
+| mockup sobre la tarjeta | 80% | 80.0% |
+| posteos | 18 en 6 grupos, 1:1, debajo | 18 en 6 grupos, 1:1, debajo |
+| branding: columnas | 570px x2, 7o caso a 1140 | `570px 570px`, 7o a 1140 |
+| branding: orden | titulo -> regla -> texto -> imagenes | titulo -> texto -> imagenes |
+| branding: regla | `1px solid rgb(0,0,0)` al 88% | idem |
+| branding: titulo | Playfair Display 32px centrado | idem |
+| branding: parrafo | 16px / 24px `rgb(27,27,27)` | idem |
+| branding: imagenes | 88% del ancho, 14 en total | idem, 3/2/1/2/2/2/2 |
+
+El 7o caso ocupa la fila entera por `:last-child:nth-child(odd)`, no por nombre: si
+la clienta suma un octavo caso sigue funcionando.
+
+`/animacion-2d-y-3d/` verificado despues del refactor del lightbox: 8 disparadores,
+abre, Escape real lo cierra y devuelve el foco, items siguen en 200px.
+
+Commit: `feat(portfolio): branding en dos columnas y mockup de celular en rrss`
 
 Lightbox con `<dialog>` nativo, sin libreria. **Medir en el navegador antes de
 escribir** — el error de las dos columnas del trabajo salio de no hacerlo.

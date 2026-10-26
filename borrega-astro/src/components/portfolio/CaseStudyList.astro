@@ -15,19 +15,20 @@ const { items } = Astro.props;
 ---
 
 <section class="case-studies">
-  <div class="container">
+  <div class="cases">
     {
       items.map((item) => (
         <article class="case" data-reveal>
-          <div class="case-images" data-count={item.images.length}>
-            {item.images.map((img) => (
-              <Image src={img} alt={item.title} width={640} loading="lazy" widths={[320, 480, 640]} sizes="(max-width: 640px) 100vw, 50vw" />
-            ))}
-          </div>
+          <h2>{item.title}</h2>
+          <hr class="case-rule" />
           <div class="case-copy">
-            <h2>{item.title}</h2>
             <p>{item.text}</p>
             {item.attribution && <p class="attribution">{item.attribution}</p>}
+          </div>
+          <div class="case-images">
+            {item.images.map((img) => (
+              <Image src={img} alt={item.title} width={640} loading="lazy" widths={[320, 480, 640]} sizes="(max-width: 640px) 88vw, 500px" />
+            ))}
           </div>
         </article>
       ))
@@ -40,50 +41,71 @@ const { items } = Astro.props;
     background: var(--color-white);
     padding-block: var(--space-4);
   }
-  .case {
-    display: grid;
-    gap: var(--space-3);
-    padding-block: var(--space-4);
-    border-bottom: 1px solid rgba(27, 27, 27, 0.1);
-  }
-  .case:last-child {
-    border-bottom: none;
-  }
-  .case-images {
+  /* Rejilla 50/50 dentro de 1140px, como el original. Un caso sin pareja (el
+     último, si la cantidad es impar) ocupa ambas columnas por sí solo: así un
+     octavo caso futuro sigue funcionando sin tratar ningún nombre aparte. */
+  .cases {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-1);
-  }
-  .case-images[data-count='2'],
-  .case-images[data-count='3'] {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .case-images :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius-sm, 6px);
-    display: block;
-  }
-  .case-copy h2 {
-    font-size: 1.5rem;
-    margin-bottom: var(--space-1);
-  }
-  .case-copy p {
-    color: rgba(27, 27, 27, 0.75);
-    line-height: 1.6;
-  }
-  .attribution {
-    margin-top: var(--space-1);
-    font-size: 0.85rem;
-    font-style: italic;
-    color: rgba(27, 27, 27, 0.5);
+    gap: var(--space-4) 0;
+    max-width: 1140px;
+    margin-inline: auto;
+    padding-inline: var(--space-2);
   }
   @media (min-width: 900px) {
-    .case {
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: var(--space-4);
+    .cases {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      /* Sin gutter: el 88% interno de cada caso ya deja el aire lateral. */
+      padding-inline: 0;
     }
+    .case:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+  .case {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .case h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    text-align: center;
+    color: rgb(27, 27, 27);
+    margin: 0;
+  }
+  /* Regla bajo el título: 88% de la columna, 1px negro (medido en el original). */
+  .case-rule {
+    width: 88%;
+    margin: var(--space-2) 0;
+    border: 0;
+    border-top: 1px solid rgb(0, 0, 0);
+  }
+  .case-copy {
+    width: 88%;
+  }
+  .case-copy p {
+    font-family: var(--font-text);
+    font-size: 16px;
+    line-height: 24px;
+    text-align: left;
+    color: rgb(27, 27, 27);
+    margin: 0 0 var(--space-1);
+  }
+  .attribution {
+    font-style: italic;
+  }
+  .case-images {
+    width: 88%;
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+  /* Proporción natural, sin recorte. height:auto es obligatorio: los atributos
+     width/height de <Image> actúan como pista y, sin esto, ganan al CSS. */
+  .case-images :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 </style>
