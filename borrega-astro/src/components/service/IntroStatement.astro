@@ -1,21 +1,50 @@
 ---
 interface Props {
-  eyebrowHtml: string;
+  /** Uno o varios parrafos. Array cuando el original los tiene separados. */
+  eyebrowHtml: string | string[];
   conclusionHtml?: string;
+  /** h2 propio sobre el parrafo, para paginas donde el original separa titulo y texto. */
+  headingHtml?: string;
+  /** Parrafo bajo la conclusion (el original lo tiene como elemento aparte). */
+  conclusionBodyHtml?: string;
+  /** Frase de cierre en negrita, en su propia seccion de ancho completo. */
+  closingHtml?: string;
 }
-const { eyebrowHtml, conclusionHtml } = Astro.props;
+const { eyebrowHtml, conclusionHtml, headingHtml, conclusionBodyHtml, closingHtml } = Astro.props;
 ---
 
 <section class="intro">
   <div class="container">
-    <p class="lead" data-reveal set:html={eyebrowHtml} />
-    {conclusionHtml && <p class="conclusion" data-reveal set:html={conclusionHtml} />}
+    {/* set:html es seguro aca: los strings son constantes escritas a mano en nuestras
+        paginas (mismo patron que FAQAccordion). Nada de WordPress, la red o un usuario
+        llega a estas props. */}
+    {headingHtml && <h2 class="heading" data-reveal set:html={headingHtml} />}
+    {(Array.isArray(eyebrowHtml) ? eyebrowHtml : [eyebrowHtml]).map((para) => (
+      <p class="lead" data-reveal set:html={para} />
+    ))}
+    {/* h2 y no p: en los tres originales ("Börrega Inside es la solución.",
+        "Börrega Audit es lo que su empresa necesita.", "Börrega Core es nuestro
+        servicio de comunicación integral.") este es un encabezado de seccion de
+        verdad. Venia como parrafo y por eso faltaba del esquema de titulos. */}
+    {conclusionHtml && <h2 class="conclusion" data-reveal set:html={conclusionHtml} />}
+    {conclusionBodyHtml && <p class="lead conclusion-body" data-reveal set:html={conclusionBodyHtml} />}
   </div>
 </section>
+{closingHtml && (
+  <section class="intro closing">
+    <div class="container">
+      <p class="lead" data-reveal set:html={closingHtml} />
+    </div>
+  </section>
+)}
 
 <style>
   .intro { background: var(--color-bg); color: var(--color-white); padding-block: var(--space-5) var(--space-3); text-align: center; }
   .lead { max-width: 62ch; margin-inline: auto; font-size: 1.1rem; opacity: 0.9; }
+  .heading { font-size: 1.6rem; margin-bottom: var(--space-2); }
+  .conclusion-body { margin-top: var(--space-2); }
+  .closing { padding-block: var(--space-3); }
+  .closing .lead { font-weight: 700; opacity: 1; }
   .conclusion { font-family: var(--font-display); font-size: 1.6rem; margin-top: var(--space-3); }
   .intro :global(.hl) { color: var(--color-pink); }
   .intro :global(.hl-purple) { color: var(--color-secondary); }

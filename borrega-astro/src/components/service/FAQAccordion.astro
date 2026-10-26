@@ -1,5 +1,7 @@
 ---
-interface FAQItem { question: string; answer: string }
+/** Un parrafo (puede llevar <strong>) o una lista de vinetas. */
+type FAQBlock = string | { list: string[] };
+interface FAQItem { question: string; answer: string; body?: FAQBlock[] }
 interface Props { items: FAQItem[] }
 const { items } = Astro.props;
 ---
@@ -15,7 +17,21 @@ const { items } = Astro.props;
             <span class="chevron" aria-hidden="true">↓</span>
           </button>
           <div class="faq-answer" id={`faq-a-${i}`}>
-            <p>{item.answer}</p>
+            {item.body?.length ? (
+              <div class="faq-answer-inner">
+                {item.answer && <p>{item.answer}</p>}
+                {/* set:html es seguro aca: los strings son constantes escritas a mano en
+                    nuestras paginas (mismo nivel de confianza que escribir el HTML directo).
+                    Nada de WordPress, la red o un usuario llega a esta prop. */}
+                {item.body.map((block) =>
+                  typeof block === 'string'
+                    ? <p class="faq-body" set:html={block} />
+                    : <ul class="faq-body">{block.list.map((li) => <li set:html={li} />)}</ul>
+                )}
+              </div>
+            ) : (
+              <p>{item.answer}</p>
+            )}
           </div>
         </div>
       ))}
@@ -51,7 +67,10 @@ const { items } = Astro.props;
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.3s var(--ease-out);
   }
-  .faq-answer > p {
+  /* Con body hay varios <p>: se envuelven en un solo hijo directo, porque la
+     animacion 0fr -> 1fr solo colapsa la primera fila del grid. */
+  .faq-answer > p,
+  .faq-answer > .faq-answer-inner {
     overflow: hidden;
     min-height: 0;
     margin: 0;
@@ -59,8 +78,15 @@ const { items } = Astro.props;
     color: rgba(255,255,255,0.75);
     font-size: 0.92rem;
   }
+  .faq-answer-inner > p { margin: 0; }
+  .faq-answer-inner > .faq-body { margin-top: 0.75rem; color: rgba(255,255,255,0.6); }
+  .faq-answer-inner > ul.faq-body { padding-left: 1.25rem; list-style: disc; display: grid; gap: 0.5rem; }
+  /* Sin lead (answer vacio) el primer bloque del body es la respuesta: color pleno. */
+  .faq-answer-inner > .faq-body:first-child { margin-top: 0; color: rgba(255,255,255,0.75); }
+  .faq-answer-inner strong { font-weight: 600; }
   .faq-item.is-open .faq-answer { grid-template-rows: 1fr; }
-  .faq-item.is-open .faq-answer > p { padding-bottom: 1rem; }
+  .faq-item.is-open .faq-answer > p,
+  .faq-item.is-open .faq-answer > .faq-answer-inner { padding-bottom: 1rem; }
 </style>
 
 <script>

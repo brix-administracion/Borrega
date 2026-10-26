@@ -51,7 +51,7 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
           'Posicionamiento y propuesta de valor',
           'Identidad y coherencia de marca',
           'Mensaje central y narrativa',
-          'Coherencia entre canales (web, redes, piezas, campañas)',
+          'Coherencia entre canales (web, redes, piezas, campañas o redes)',
           'Oportunidades estratégicas',
           'Comunicación visual y verbal',
         ],
@@ -59,7 +59,7 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
       {
         heading: 'Qué les entregamos',
         items: [
-          'Diagnóstico integral — Análisis completo del estado actual de tu comunicación de marca',
+          'Diagnóstico integral — Análisis completo del estado actual de tu comunicación de marca o solo de las redes sociales',
           'Mapa de inconsistencias — Visualización clara de los puntos de mejora detectados',
           'Lineamientos estratégicos de mejora — Guía con acciones concretas para fortalecer tu comunicación',
         ],
@@ -69,10 +69,35 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
 
   <FAQAccordion
     items={[
-      { question: '¿Qué es una auditoría de comunicación?', answer: 'Es un diagnóstico integral que analiza la comunicación de una marca como sistema: mensaje, identidad, coherencia y posicionamiento.' },
-      { question: '¿En qué se diferencia la auditoría integral de la auditoría de redes sociales?', answer: 'La auditoría de comunicación es más amplia: analiza todos los canales y la estrategia global de marca, no solo redes.' },
-      { question: '¿La auditoría integral incluye branding y posicionamiento?', answer: 'Sí. Se evalúa la propuesta de valor, narrativa y coherencia de marca.' },
-      { question: '¿Para qué tipo de marcas es recomendable?', answer: 'Para cualquier tipo de marca, desde startups hasta grandes corporaciones, especialmente las que buscan crecimiento sostenido y mayor competitividad.' },
+      {
+        question: '¿Qué es una auditoría de comunicación?',
+        answer: 'Es un diagnóstico integral que analiza la comunicación de una marca como sistema: mensaje, identidad, coherencia y posicionamiento.',
+        body: [
+          'Una auditoría de comunicación es una evaluación sistemática y exhaustiva de las prácticas comunicativas de una organización para diagnosticar sus fortalezas, debilidades y áreas de mejora, asegurando que los mensajes se alineen con los objetivos estratégicos y sean percibidos correctamente por sus públicos (empleados, clientes, etc.).',
+          'Utiliza diversas metodologías (encuestas, análisis de datos, entrevistas) para identificar brechas en el flujo de información, la coherencia de los mensajes y la efectividad de los canales, buscando optimizar la identidad y la imagen corporativa.',
+        ],
+      },
+      {
+        question: '¿En qué se diferencia la auditoría integral de la auditoría de redes sociales?',
+        answer: 'La auditoría de comunicación es más amplia: analiza todos los canales y la estrategia global de marca, no solo redes.',
+        body: [
+          'La auditoría de comunicación integral evalúa <strong>toda la estrategia comunicativa de una empresa (interna, externa, medios propios y ganados)</strong> para asegurar coherencia y alineación con objetivos, mientras que la auditoría de redes sociales es un <strong>componente específico</strong> que se centra únicamente en la <strong>presencia, rendimiento y estrategia en plataformas sociales</strong> (Facebook, Instagram, X, etc.), identificando qué funciona y qué no en esos canales digitales. La integral abarca el todo, incluyendo las redes sociales; la de redes sociales es una auditoría detallada de una parte de ese todo.',
+        ],
+      },
+      {
+        question: 'La auditoría integral ¿Incluye branding y posicionamiento?',
+        answer: 'Sí. Se evalúa la propuesta de valor, narrativa y coherencia de marca.',
+        body: [
+          'Una auditoría integral (especialmente una de marca o marketing) <strong>incluye fundamentalmente el branding y el posicionamiento</strong>, ya es una revisión exhaustiva de la identidad, mensaje, presencia y percepción del cliente para asegurar coherencia y alineación estratégica. Evalúa cómo la marca quiere ser percibida vs. cómo es realmente vista, analizando tono de voz, experiencia del cliente, identidad visual y puntos de contacto para identificar fortalezas y debilidades frente a la competencia.',
+        ],
+      },
+      {
+        question: '¿Para qué tipo de marcas es recomendable?',
+        answer: '',
+        body: [
+          'La auditoría integral es recomendable para cualquier tipo de marca, desde startups hasta grandes corporaciones, especialmente aquellas en <strong>sectores dinámicos</strong> (digitales, medios) o que buscan <strong>crecimiento sostenido, mejorar la gestión, ser más competitivas y gestionar riesgos</strong>; es crucial para alinear la estrategia, detectar ineficiencias, asegurar el cumplimiento y entender la percepción del cliente, siendo beneficiosa en <strong>cualquier tamaño de empresa</strong> para asegurar salud financiera, operativa y reputacional.',
+        ],
+      },
     ]}
   />
 

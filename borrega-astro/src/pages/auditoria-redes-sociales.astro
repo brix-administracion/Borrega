@@ -15,12 +15,14 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
     variant="glow"
     decorIcons
     primaryCta={{ label: 'AGENDAR REUNIÓN', href: '/reservar-consulta' }}
+    secondaryCta={{ label: 'QUÉ INCLUYE', href: '#servicios' }}
   />
 
   <FeatureColumns
     columns={[
       {
         heading: 'Publicar sin estrategia clara',
+        intro: 'Publicar sin una estrategia clara suele generar desgaste, baja interacción y falta de resultados. Muchas marcas sienten que “hacen todo” en redes sociales, pero no logran impacto ni crecimiento real.',
         items: [
           'Desgaste constante sin ver resultados',
           'Baja interacción en tus publicaciones',
@@ -29,11 +31,15 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
       },
       {
         heading: 'Diagnóstico estratégico',
-        intro: 'La Auditoría de Redes Sociales es un servicio de diagnóstico estratégico que analiza el estado actual de tu marca en plataformas sociales. Evaluamos contenido, identidad visual, mensaje y coherencia para detectar oportunidades de mejora concretas y accionables.',
+        intro: [
+          'La Auditoría de Redes Sociales es un servicio de diagnóstico estratégico que analiza el estado actual de tu marca en plataformas sociales.',
+          'Evaluamos contenido, identidad visual, mensaje y coherencia para detectar oportunidades de mejora concretas y accionables. No es una opinión: es un análisis profesional con criterio de marca y negocio.',
+        ],
         items: ['Análisis profesional', 'Identidad visual', 'Oportunidades concretas', 'Recomendaciones accionables'],
       },
       {
         heading: 'Qué incluye',
+        id: 'servicios', // ancla del CTA secundario del hero
         items: [
           'Análisis del perfil y biografía',
           'Evaluación de contenidos publicados',
@@ -58,14 +64,20 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
     ]}
   />
 
+  {/* En el original el boton del precio apunta a "#" (link sin terminar); lo mandamos a la
+      pagina de reserva, que es lo que el boton realmente pide. */}
   <PricingCard
     price="USD 350"
     items={['Análisis completo de tu presencia', 'Recomendaciones accionables', 'Documento de diagnóstico detallado', 'Entrega en pocos días']}
     ctaLabel="SOLICITAR AUDITORÍA"
+    labelAsHeading
+    ctaHref="/reservar-consulta"
   />
 
   <Checklist
+    sectionHeading="¿Es para vos?"
     heading="Es para vos si…"
+    headingLevel={3}
     tone="plain"
     items={[
       'Sentís que tus redes no están funcionando',

@@ -1,35 +1,114 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GradientHero from '../components/GradientHero.astro';
+
+// Esta pagina es el final del embudo de todo el sitio: las 5 landings de
+// servicio, ServiceHero, ServiceFinalCTA, PricingCard y las dos plantillas de
+// post mandan aca con el boton "AGENDAR REUNION". Hasta ahora ofrecia WhatsApp
+// y mail, pero no agendaba: el original si, con Calendly.
+//
+// Es el MISMO evento de 30 minutos que usa borregastudio.com/reserva/, o sea la
+// misma disponibilidad y el mismo calendario de Pilar.
+//
+// Por que el embed oficial y no la UI del original: la pagina de WordPress
+// muestra un calendario propio de 3 pasos (Calendario / Horario / Datos) que es
+// el skin del widget `ha-calendly` de HappyAddons hablandole a la API de
+// Calendly. Reproducir eso aca significaria poner un token de Calendly dentro
+// de un sitio estatico, donde cualquiera lo lee. El embed oficial no necesita
+// ninguna credencial nuestra: cambia la piel, no la funcion.
+const CALENDLY_EVENT = 'https://calendly.com/pilar-borregastudio/30min';
+
+// hide_event_type_details replica lo que hace el original (el titulo y la
+// duracion ya estan en esta pagina, no hacen falta dos veces).
+// Los colores van para que el calendario no entre en blanco sobre el fondo
+// negro de la seccion. El banner de GDPR NO se oculta: es el consentimiento de
+// cookies de Calendly y le corresponde al visitante.
+const CALENDLY_SRC = `${CALENDLY_EVENT}?hide_event_type_details=1&background_color=1b1b1b&text_color=ffffff&primary_color=792fff`;
 ---
 
-<BaseLayout title="Reservar Consulta — Börrega Studio" description="Coordinemos una consultoría gratuita para tu proyecto.">
+<BaseLayout
+  title="Reserva — Börrega Studio"
+  description="Agendá una reunión de 30 minutos con Börrega Studio. Sin costo, sin compromiso."
+>
   <GradientHero>
-    Reservar Consulta
-    <Fragment slot="subtitle">Contanos un poco sobre tu proyecto y coordinamos un horario que te quede cómodo. Sin costo, sin compromiso.</Fragment>
+    Reserva
+    <Fragment slot="subtitle">
+      Sabemos que el éxito de tu empresa depende de decisiones estratégicas. En Börrega, estamos muy
+      contentos de dar este primer paso contigo. Una reunión de 30 minutos puede marcar la diferencia
+      para potenciar tu marca, producto o proyecto. Adelante, ¡reserva tu espacio!
+    </Fragment>
   </GradientHero>
 
+  <section class="booking">
+    <div class="container">
+      <div class="calendly-inline-widget" data-url={CALENDLY_SRC} data-reveal></div>
+
+      <noscript>
+        <p class="booking-fallback">
+          Para ver el calendario hace falta JavaScript.
+          <a href={CALENDLY_EVENT} target="_blank" rel="noopener">Abrí el calendario en Calendly</a>
+          o escribinos a <a href="mailto:info@borregastudio.com">info@borregastudio.com</a>.
+        </p>
+      </noscript>
+    </div>
+  </section>
+
   <section class="contact-options">
-    <div class="container contact-grid">
-      <a class="contact-card" href="https://wa.me/5491171327309" target="_blank" rel="noopener">
-        <span class="contact-icon" aria-hidden="true">💬</span>
-        <h2>WhatsApp</h2>
-        <p>+54 9 11 7132-7309 — la vía más rápida para coordinar el horario.</p>
-      </a>
-      <a class="contact-card" href="mailto:info@borregastudio.com?subject=Quiero%20reservar%20una%20consultor%C3%ADa">
-        <span class="contact-icon" aria-hidden="true">✉</span>
-        <h2>Escribinos</h2>
-        <p>info@borregastudio.com — contanos día y horario tentativos.</p>
-      </a>
+    <div class="container">
+      <h2 class="contact-title">¿Preferís escribirnos?</h2>
+      <div class="contact-grid">
+        <a class="contact-card" href="https://wa.me/5491171327309" target="_blank" rel="noopener">
+          <span class="contact-icon" aria-hidden="true">💬</span>
+          <h3>WhatsApp</h3>
+          <p>+54 9 11 7132-7309 — la vía más rápida para coordinar el horario.</p>
+        </a>
+        <a class="contact-card" href="mailto:info@borregastudio.com?subject=Quiero%20reservar%20una%20consultor%C3%ADa">
+          <span class="contact-icon" aria-hidden="true">✉</span>
+          <h3>Escribinos</h3>
+          <p>info@borregastudio.com — contanos día y horario tentativos.</p>
+        </a>
+      </div>
     </div>
   </section>
 </BaseLayout>
 
+{/* Script de terceros: solo en esta pagina, no en BaseLayout. `is:inline` para
+    que Astro no intente empaquetar un archivo remoto, y `async` es lo que
+    documenta Calendly para el widget inline. */}
+<script is:inline async src="https://assets.calendly.com/assets/external/widget.js"></script>
+
 <style>
+  .booking {
+    background: var(--color-bg);
+    color: var(--color-white);
+    padding-block: var(--space-5) var(--space-3);
+  }
+  /* El widget se dibuja en un iframe propio, asi que necesita un alto
+     explicito: no crece con su contenido. 700px es lo que recomienda Calendly
+     para que el mes entero entre sin scroll interno; en pantallas angostas el
+     calendario pasa a lista y necesita mas. */
+  .calendly-inline-widget {
+    min-width: 320px;
+    height: 700px;
+  }
+  @media (max-width: 700px) {
+    .calendly-inline-widget { height: 1000px; }
+  }
+  .booking-fallback {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .booking-fallback a { color: var(--color-accent); }
+
   .contact-options {
     background: var(--color-bg);
     color: var(--color-white);
-    padding-block: var(--space-5);
+    padding-block: var(--space-3) var(--space-5);
+  }
+  .contact-title {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: var(--space-3);
   }
   .contact-grid {
     display: grid;
@@ -50,7 +129,7 @@ import GradientHero from '../components/GradientHero.astro';
     transform: translateY(-4px);
   }
   .contact-icon { font-size: 2rem; display: block; margin-bottom: var(--space-2); }
-  .contact-card h2 { font-size: 1.2rem; }
+  .contact-card h3 { font-size: 1.2rem; }
   .contact-card p { color: rgba(255, 255, 255, 0.75); margin-top: var(--space-1); }
 
   @media (min-width: 700px) {
