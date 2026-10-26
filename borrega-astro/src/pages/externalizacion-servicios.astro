@@ -59,10 +59,43 @@ import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
 
   <FAQAccordion
     items={[
-      { question: '¿Qué es la externalización de servicios de comunicación?', answer: 'Es un modelo donde un estudio externo funciona como el departamento de comunicación de una empresa.' },
-      { question: '¿Reemplaza a un equipo interno?', answer: 'Puede reemplazarlo o complementarlo, según las necesidades del negocio.' },
-      { question: '¿El servicio es fijo o flexible?', answer: 'Es flexible y escalable. En nuestro caso es escalable con 30 días de anticipación.' },
-      { question: '¿Qué tipo de empresas contratan este servicio?', answer: 'Grandes corporaciones que necesitan continuidad, y también pymes que buscan un equipo de comunicación sin armarlo internamente.' },
+      { question: '¿Qué es la externalización de servicios de comunicación?', answer: 'Es un modelo donde un estudio externo funciona como el departamento de comunicación de una empresa. La externalización de servicios de comunicación práctica estratégica de delegar funciones o procesos relacionados con la comunicación a proveedores externos especializados, permitiendo a la empresa principal enfocarse en su negocio central, reducir costos y acceder a tecnología y experiencia de punta.' },
+      {
+        question: '¿Reemplaza a un equipo interno?',
+        answer: 'Puede reemplazarlo o complementarlo, según las necesidades del negocio.',
+        body: [
+          { list: [
+            '<strong>Sí, puede reemplazarlo:</strong> En algunos casos, una empresa puede decidir eliminar su departamento interno de comunicación y contratar a una agencia para que lo reemplace por completo.',
+            '<strong>O puede complementarlo:</strong> Alternativamente, puede trabajar junto a un equipo interno para potenciar áreas específicas (ej., una agencia gestiona redes sociales mientras el equipo interno maneja comunicados de prensa).',
+            '<strong>Beneficios clave:</strong> A menudo, es más rentable que mantener un equipo completo, ofrece economías de escala y permite acceso inmediato a tecnología y talento especializado.',
+          ] },
+        ],
+      },
+      {
+        question: '¿El servicio es fijo o flexible?',
+        answer: 'Es flexible y escalable. En nuestro caso es escalable con 30 días de anticipación.',
+        body: [
+          'La externalización de servicios de comunicación es inherentemente <strong>flexible</strong>, permitiendo a las empresas convertir costos fijos en variables, adaptarse rápidamente a necesidades cambiantes (escalabilidad) y acceder a experiencia especializada sin compromisos a largo plazo, ofreciendo una alternativa ágil y rentable frente a mantener un departamento fijo y costoso internamente.',
+          '<strong>Ventajas de la Flexibilidad:</strong>',
+          { list: [
+            '<strong>Costos Variables:</strong> Se paga por el servicio según se necesite, reduciendo gastos fijos en salarios, beneficios e infraestructura.',
+            '<strong>Adaptabilidad:</strong> Facilita la expansión o reducción rápida de recursos según picos de demanda o cambios en el mercado.',
+            '<strong>Acceso a Expertise:</strong> Permite contratar especialistas (estrategia, redes sociales, PR) sin largas contrataciones.',
+            '<strong>Enfoque en el Negocio Principal:</strong> Libera recursos internos para que la empresa se concentre en sus competencias clave.',
+          ] },
+        ],
+      },
+      {
+        question: '¿Qué tipo de empresas contratan este servicio?',
+        answer: '',
+        body: [
+          { list: [
+            '<strong>Grandes corporaciones</strong> que necesitan continuidad sin armar un equipo interno completo. Estas usan el outsourcing para funciones específicas, obteniendo tecnología, control de calidad y eficiencia.',
+            '<strong>Pequeñas y Medianas Empresas (PYMES)</strong> que no tienen los recursos internos suficientes para armar un equipo interno de calidad. Es una opción muy inteligente para PYMES porque les permite ahorrar dinero y tiempo.',
+            '<strong>Startups y Empresas en Crecimiento.</strong> que buscan optimizar recursos y convertir costos fijos en variables, externalizando funciones y así mantener el equilibrio financiero.',
+          ] },
+        ],
+      },
     ]}
   />
 

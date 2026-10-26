@@ -98,13 +98,51 @@ nuestras. Cambia la piel, no la funcion.
 
 ### T2 — Cuerpos largos de FAQ
 
-- [ ] `FAQAccordion.astro`: campo opcional `body?: string[]` renderizado como
-      parrafos despues del `answer`, sin romper las FAQ que ya estan bien.
-- [ ] `/externalizacion-servicios/`: portar los 4 cuerpos verbatim y restaurar el
-      lead original de Q4.
-- [ ] `/auditoria-comunicacion/`: portar los cuerpos de Q1-Q3, reemplazar la
-      respuesta de Q4 por el parrafo completo del original, y restaurar los titulos
-      exactos de Q2 y Q3.
+- [x] `FAQAccordion.astro`: `body?: FAQBlock[]` donde `FAQBlock = string |
+      { list: string[] }`, renderizado despues del `answer`, sin romper las FAQ que
+      ya estan bien.
+- [x] `/externalizacion-servicios/`: portar los 4 cuerpos verbatim con sus listas.
+- [x] `/auditoria-comunicacion/`: portar los cuerpos, restaurar el titulo de Q3.
+
+**Dos bugs encontrados, uno ajeno y uno propio.**
+
+*Del acordeon (preexistente):* anima `grid-template-rows` de `0fr` a `1fr`, pero
+ese `0fr` solo aplicaba al primer `<p>`. Los parrafos extra habrian quedado
+**visibles con el acordeon cerrado**. Se resolvio envolviendo answer + body en un
+`.faq-answer-inner`, un unico hijo del grid que colapsa como unidad.
+
+*De la extraccion (mio):* saque los textos con regex sobre el HTML y el JSON
+"verbatim" perdio estructura. 3 de las 4 respuestas de externalizacion tienen un
+`<ul>` y 6 de los 8 cuerpos tienen `<strong>`. El ratio daba 102% — los caracteres
+estaban, la forma no, y la forma es el objetivo. Ademas partio Q1 en dos parrafos
+donde el original tiene un bloque continuo, y dejo un `</strong>` sin abrir en Q4
+de auditoria. Rehecho con DOM walk (`node-html-parser`): 0 desbalanceados.
+
+**Verificado en el navegador** (no solo en el HTML):
+
+| | externalizacion | auditoria |
+|---|---|---|
+| lista cerrada / abierta | 217px / 891px | 217px / 1012px |
+| `<ul>` / `<li>` en respuestas | 3 / 10 | 0 / 0 |
+| `<strong>` en respuestas | 12 | 7 |
+| parrafos vacios | 0 | 0 |
+| markup escapado en pantalla | no | no |
+
+Viñetas `disc` visibles y rotulos en negrita, igual que el original. Ratios: **102%**
+y **101%**. `npx tsc --noEmit` exit 0, build 47 paginas.
+
+**Cuidado con dos instrumentos que me dieron falsos positivos:**
+- `checkVisibility()` NO detecta el recorte por `overflow:hidden` del ancestro: da
+  `true` con el acordeon cerrado. La prueba valida es el alto de la lista (217px con
+  los 4 cerrados = solo los botones) mas la captura.
+- La primera medicion dio `opacity: 0` porque `data-reveal` no habia disparado: hay
+  que traer la seccion a pantalla y esperar antes de medir.
+
+Q4 de ambas paginas usa `answer: ''` porque el original no tiene lead separado
+(externalizacion Q4 es un `<ul>` puro, auditoria Q4 un parrafo con `<strong>`); el
+componente omite el `<p>` del lead cuando viene vacio.
+
+Commit: `fix(servicios): restaurar las respuestas completas de las FAQ`
 
 **Correccion al relevamiento inicial:** el subagente reporto FAQ truncadas en 4
 paginas. Extraje los `<details>` verbatim de las 4 y es **falso para 2**:
