@@ -374,8 +374,55 @@ Caso aparte: el cuerpo de Q2 de externalizacion termina cortado en el original
 
 ## Progreso
 
-Nada cerrado todavia. Siguiente: T1.
+**T1, T2, T3 y T4 cerrados y verificados en navegador. T5 y T6 pendientes.**
+
+Rama `feat/paridad-sitio-original`, 5 commits, **sin pushear**. 19 archivos,
++1038/-132. Arbol limpio.
+
+| # | commit | que cerro |
+|---|---|---|
+| 1 | `b3b76fea` | T1 — Calendly en `/reservar-consulta/` |
+| 2 | `5afc4fac` | T2 — cuerpos largos de FAQ (+ bug del acordeon) |
+| 3 | `176cd34d` | T3 — secciones y encabezados faltantes |
+| 4 | `5ce43296` | T4a — masonry, justified y lightbox |
+| 5 | `ecd0ffac` | T4b — branding 2 columnas y mockup de celular |
+
+Ratios de texto contra el original, medidos: `/reservar-consulta/` 99%,
+`/externalizacion-servicios/` 102%, `/auditoria-comunicacion/` 102%,
+`/servicios-multidisciplinarios/` 103%, `/auditoria-redes-sociales/` 105%.
+
+Esquema de `<h2>` identico al original en las 4 paginas de servicio, salvo las
+diferencias deliberadas anotadas en T3.
+
+## Decisiones pendientes de Ignacio
+
+1. **Push y merge** de los 5 commits. Conviene mirarlos en staging antes de T5/T6.
+2. **Los typos del original** (ver seccion mas abajo), mas los dos defectos
+   estructurales que encontre en T3: `auditoria-comunicacion` y
+   `externalizacion-servicios` **no tienen `<h1>`** en el original, y marcan
+   parrafos enteros como `<h2>`. Astro corrige las dos cosas. Revertirlo es
+   cuestion de minutos si quiere paridad literal.
+3. **Access Key de Web3Forms** — la crea el en web3forms.com; el plumbing ya esta.
+
+## Sin verificar (honesto, no asumido)
+
+- **Las reglas responsive de las galerias.** La ventana de Chrome no se dejo
+  redimensionar (`outerWidth` siguio en 1440 despues del resize), asi que se
+  confirmaron en el CSS compilado pero NO se ejercitaron: `columns:4` -> `2` en
+  `max-width:1024px` -> `1` en `640px`, y `--row-h: 150px` en tablet. Mirarlo en un
+  telefono es un minuto.
+- El layout de branding en una columna (movil) tampoco se midio.
 
 ## Siguiente paso
 
-T1 — el scheduler, que es lo que mas se ve y lo que desbloquea los 10 CTAs.
+**T5** (links sociales reales, description del home, OG completo, y el error del
+formulario que le muestra `src/lib/formConfig.ts` al visitante) y **T6** (los 20
+trabajos con `noindex`, sitemap de 25 a 46 URLs, 301 de las 60 URLs viejas,
+robots.txt con la allowlist de crawlers de IA).
+
+Las dos son mas chicas y mas mecanicas que lo que ya se hizo. T6 es la unica que
+toca SEO, y es de riesgo cero para el sitio original.
+
+**Al retomar**, leer este archivo y correr el chequeo de esquema de `<h2>` antes de
+tocar nada: es el instrumento que encontro los dos huecos que el ratio de texto no
+veia.
