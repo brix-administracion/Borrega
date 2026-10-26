@@ -4,7 +4,6 @@ import PortfolioHero from '../components/portfolio/PortfolioHero.astro';
 import PhotoGallery from '../components/portfolio/PhotoGallery.astro';
 import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
 
-import anim01 from '../assets/images/portfolio/animacion/anim-01.jpg';
 import anim02 from '../assets/images/portfolio/animacion/anim-02.jpg';
 import anim03 from '../assets/images/portfolio/animacion/anim-03.jpg';
 import anim04 from '../assets/images/portfolio/animacion/anim-04.jpg';
@@ -14,12 +13,14 @@ import anim07 from '../assets/images/portfolio/animacion/anim-07.jpg';
 import anim08 from '../assets/images/portfolio/animacion/anim-08.jpg';
 import anim09 from '../assets/images/portfolio/animacion/anim-09.png';
 
-const images = [anim01, anim02, anim03, anim04, anim05, anim06, anim07, anim08, anim09];
+// anim-01.jpg se descartó a propósito: no está en la galería original del sitio
+// (que tiene 8 imágenes). No volver a agregarla por error.
+const images = [anim02, anim03, anim04, anim05, anim06, anim07, anim08, anim09];
 ---
 
 <BaseLayout title="Portfolio Animación 2D y 3D — Börrega" description="Animación 2D y 3D para marcas, campañas y contenido digital.">
   <PortfolioHero title="Portfolio Animación 2D y 3D" />
-  <PhotoGallery images={images} />
+  <PhotoGallery images={images} layout="justified" />
   <ServiceFinalCTA titleHtml="Pedir <span class='hl'>Cotización</span>" ctaLabel="PEDIR COTIZACIÓN" ctaHref="/contacto" />
 </BaseLayout>
 

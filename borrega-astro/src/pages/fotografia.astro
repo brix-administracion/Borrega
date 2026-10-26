@@ -4,7 +4,6 @@ import PortfolioHero from '../components/portfolio/PortfolioHero.astro';
 import PhotoGallery from '../components/portfolio/PhotoGallery.astro';
 import ServiceFinalCTA from '../components/service/ServiceFinalCTA.astro';
 
-import foto01 from '../assets/images/portfolio/fotografia/foto-01.jpg';
 import foto02 from '../assets/images/portfolio/fotografia/foto-02.jpg';
 import foto03 from '../assets/images/portfolio/fotografia/foto-03.jpg';
 import foto04 from '../assets/images/portfolio/fotografia/foto-04.jpg';
@@ -20,12 +19,14 @@ import foto13 from '../assets/images/portfolio/fotografia/foto-13.jpg';
 import foto14 from '../assets/images/portfolio/fotografia/foto-14.jpg';
 import foto15 from '../assets/images/portfolio/fotografia/foto-15.jpg';
 
-const images = [foto01, foto02, foto03, foto04, foto05, foto06, foto07, foto08, foto09, foto10, foto11, foto12, foto13, foto14, foto15];
+// foto-01.jpg se descartó a propósito: no está en la galería original del sitio
+// (que tiene 14 imágenes). No volver a agregarla por error.
+const images = [foto02, foto03, foto04, foto05, foto06, foto07, foto08, foto09, foto10, foto11, foto12, foto13, foto14, foto15];
 ---
 
 <BaseLayout title="Portfolio Fotografía — Börrega" description="Fotografía de producto, retrato y contenido para marcas.">
   <PortfolioHero title="Portfolio Fotografía" />
-  <PhotoGallery images={images} />
+  <PhotoGallery images={images} layout="masonry" />
   <ServiceFinalCTA titleHtml="Pedir <span class='hl'>Cotización</span>" ctaLabel="PEDIR COTIZACIÓN" ctaHref="/contacto" />
 </BaseLayout>
 

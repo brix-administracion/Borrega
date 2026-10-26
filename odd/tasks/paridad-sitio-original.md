@@ -206,13 +206,45 @@ Commit: `fix(servicios): portar las secciones y encabezados que faltaban`
 
 ### T4 — Layout de galerias y casos
 
-- [ ] `/fotografia/`: masonry 4 col escritorio / 2 tablet / 1 movil, gap 10px,
-      lightbox. Hoy: grilla fija de 3 con recorte 4:3 y pestana nueva.
-- [ ] `/animacion-2d-y-3d/`: `justified` con fila ideal 200px (150px tablet),
+- [x] `/fotografia/`: masonry 4 col escritorio / 2 tablet / 1 movil, gap 10px,
       lightbox.
-- [ ] Reconciliar conteo de imagenes: Astro 15 y 9 (locales en
-      `src/assets/images/portfolio/`), original 14 y 8 segun el `data-settings` del
-      widget de Elementor.
+- [x] `/animacion-2d-y-3d/`: `justified` con fila ideal 200px (150px tablet),
+      lightbox.
+- [x] Conteo de imagenes reconciliado: **sobraba la primera en las dos galerias**.
+      Las 15 locales se mapearon una por una contra las 14 del original por
+      dimensiones en pixeles (pedidos de rango de 40KB, no descargas completas) y
+      el calce es un offset limpio: `foto-02..15` = original 1..14, `anim-02..09` =
+      original 1..8. `foto-01` (1000x667) y `anim-01` (1200x630) no tienen
+      contraparte. Se sacaron del array; los archivos quedan en disco.
+
+      Hipotesis descartada: NO son las imagenes destacadas de la pagina
+      (`Portfolios-Destacas_Photo.jpg` mide 600x400). De donde salen queda abierto.
+
+**Verificado en el navegador, con eventos reales:**
+
+| | fotografia | animacion |
+|---|---|---|
+| items | 14 | 8 |
+| layout medido | `column-count: 4`, `column-gap: 10px` | 8 items de **exactamente** 200px en 3 filas |
+| aspecto renderizado vs fuente | coincide (sin el bug de `height:auto`) | alto explicito |
+| ultima fila | — | termina en 1067px contra 1349px de las completas: no se estira |
+
+Lightbox: `dialog.open` true, foco en el boton de cerrar, **Escape real** (no un
+evento sintetico) lo cierra y devuelve el foco al disparador
+(`<a aria-label="Ampliar imagen 1 de 14">`). **Scroll bloqueado de verdad**: scroll
+real con la rueda y `scrollY` queda en 136.5 antes y despues. Sin JS el `<a href>`
+sigue abriendo el archivo.
+
+Responsive: la ventana no se dejo redimensionar, asi que las reglas se verificaron
+en el CSS compilado y NO se ejercitaron: `columns:4` -> `2` en `max-width:1024px`
+-> `1` en `640px`, y `--row-h: 150px` en tablet. Pendiente mirarlo en un dispositivo.
+
+Diferencia aceptada: el masonry por columnas CSS llena la columna 1 de arriba a
+abajo antes que la 2, mientras el de Elementor (JS) coloca de izquierda a derecha
+por columna mas corta. El orden de lectura difiere; es el precio de no sumar una
+libreria de JS.
+
+Commit: `feat(portfolio): masonry, justified y lightbox en las galerias`
 - [ ] `/portfolio-redes-sociales/`: imagen de fondo detras de cada mockup
       (slideshow de una sola imagen, fade, 5000ms); los posteos abren lightbox.
 - [ ] `/branding/`: grilla de 2 columnas (50/50) por fila, imagenes **debajo** del
