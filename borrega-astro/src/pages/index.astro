@@ -8,7 +8,12 @@ import Portfolio from '../components/Portfolio.astro';
 import Testimonials from '../components/Testimonials.astro';
 ---
 
-<BaseLayout title="Börrega Studio — Diseño, estrategia y creatividad">
+{/* La description sale textual del original: es copy de SEO escrito a proposito,
+    no una frase de relleno. Sin ella el home caia al default generico del layout. */}
+<BaseLayout
+  title="Börrega Studio — Diseño, estrategia y creatividad"
+  description="Agencia creativa de marketing y branding estratégico con base en Buenos Aires. Llevamos a las marcas a ser top of mind de su cliente ideal."
+>
   <Hero />
   <Services />
   <About />

@@ -7,6 +7,8 @@ import '@fontsource/roboto/400.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { getImage } from 'astro:assets';
+import ogDefault from '../assets/images/hero/slide-1.png';
 
 interface Props {
   title: string;
@@ -16,6 +18,28 @@ interface Props {
 }
 
 const { title, description = 'Börrega Studio — estudio de diseño, estrategia y creatividad.', ogImage, noindex = false } = Astro.props;
+
+// Imagen de preview por defecto. Hasta ahora solo el blog y los trabajos
+// mandaban `ogImage`, asi que el resto del sitio declaraba
+// `twitter:card=summary_large_image` sin imagen: WhatsApp, LinkedIn y Slack
+// mostraban la tarjeta vacia.
+//
+// Las razones del formato son las mismas que documenta la ruta de post: JPEG
+// porque es el unico que aceptan todos (LinkedIn en particular maneja mal
+// webp), 1200px porque es el ancho que recomienda Open Graph y por debajo de
+// 600 varias plataformas caen a miniatura, y URL absoluta porque el scraper no
+// resuelve relativas. El og:image del sitio original mide 600x401; ese tamaño
+// no se copia.
+const OG_IMAGE_PX = 1200;
+const ogFallback = await getImage({
+  src: ogDefault,
+  width: OG_IMAGE_PX,
+  height: Math.round((ogDefault.height / ogDefault.width) * OG_IMAGE_PX),
+  format: 'jpeg',
+  quality: 78,
+});
+const ogImageUrl = ogImage ?? new URL(ogFallback.src, Astro.site).href;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
@@ -26,14 +50,20 @@ const { title, description = 'Börrega Studio — estudio de diseño, estrategia
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Börrega" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:image" content={ogImageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
   </head>
   <body>
     <Header />
