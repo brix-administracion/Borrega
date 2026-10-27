@@ -27,10 +27,9 @@ export default defineConfig({
   // que la cache no sobrevivia y el runner volvia a bajar las imagenes de
   // WordPress en cada build. Fuera de node_modules, el workflow la persiste.
   cacheDir: './.astro-cache',
-  // /formulario/ es una URL vieja/duplicada de WordPress que muestra el
-  // mismo contenido que /sumate/ (mismo formulario, mismo texto). En vez
-  // de duplicar la página, la redirigimos para no repetir contenido.
-  redirects: {
-    '/formulario': '/sumate',
-  },
+  // Las redirecciones de las URLs viejas de WordPress NO van aca: en modo
+  // `static`, el `redirects` de Astro genera una pagina HTML con
+  // `<meta http-equiv="refresh">`, que responde **200** y deja viva la URL
+  // vieja. Para que sean 301 de verdad viven en `public/.htaccess`, que
+  // Hostinger honra (verificado: sus reglas de cache se aplican en vivo).
 });
