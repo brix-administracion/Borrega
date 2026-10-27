@@ -307,30 +307,48 @@ escribir** — el error de las dos columnas del trabajo salio de no hacerlo.
 
 ### T5 — Metadatos y links
 
-- [ ] `Header.astro:15`: los sociales apuntan a `instagram.com` y `linkedin.com`
-      genericos. Reales: `instagram.com/borregastudio`,
-      `linkedin.com/company/borregastudio`.
-- [ ] `index.astro:11`: el home no pasa description y cae al default generico.
-- [ ] `BaseLayout.astro`: faltan `og:url`, `og:site_name`, `og:locale`,
-      `twitter:title/description/image`, y no hay imagen por defecto — todas las
-      paginas declaran `summary_large_image` pero solo blog y trabajos tienen
-      `og:image`.
-- [ ] `web3form.ts:59`: el error le dice "Ver src/lib/formConfig.ts" al visitante.
-      Cambiarlo por un mensaje humano con el mail de contacto como salida.
+- [x] Sociales reales en el header. **Habia un tercero que no estaba relevado**:
+      el boton "VER LINKEDIN" de `About.astro:18`. Apunta al perfil de Pilar, que
+      es de quien habla el parrafo que lo precede, no a la pagina de empresa.
+- [x] Description del home, textual del original (copy de SEO deliberado).
+- [x] OG completo: `og:url`, `og:site_name`, `og:locale`, las tres `twitter:*` y
+      una imagen por defecto a 1200px JPEG con `getImage()`.
+- [x] El error del formulario ya no filtra rutas del repo al visitante.
+
+**Verificado sobre dist:** las **47** paginas tienen `og:image`; `og:url` cambia por
+pagina (`/`, `/borrega-blog/`, `/contacto/` dan tres valores distintos); el head del
+home trae las 12 etiquetas; los tres perfiles sociales responden (el 301 de LinkedIn
+es su redireccion canonica); cero rutas del repo en el JS servido.
+
+El `og:image` del original mide 600x401, por debajo de los 1200px que recomienda
+Open Graph. Ese tamaño no se copio.
+
+Commit: `4ddbc208`
 
 - Ruta: inline (cambios mecanicos ya entendidos)
 - Checks: build, inspeccion del `<head>` en dist
 
 ### T6 — Paridad de indexacion
 
-- [ ] Quitar `noindex={!isPublic}` de `[year]/[month]/[day]/[slug].astro:68`.
-- [ ] Sumar los trabajos al sitemap con `getWorkPosts()` (la misma funcion que usa
-      `nuestro-trabajo.astro:8`, asi listado y sitemap no se desincronizan) y
-      agregar `/nuestro-trabajo/` a `STATIC_ROUTES`. De 25 a 46 URLs.
-- [ ] 301 de las 60 URLs viejas en `public/.htaccess`: 59 archivos de taxonomia
-      (`/category/...`, `/author/...`) mas `/reserva/`. Cuatro reglas por patron.
-      Mover `/formulario` aca tambien.
-- [ ] `robots.txt`: portar la allowlist de crawlers de IA del original.
+- [x] Quitado el `noindex` de los 20 trabajos.
+- [x] Sitemap con `getWorkPosts()` + `/nuestro-trabajo/`: de **25 a 46** URLs.
+- [x] 301 por patron en `public/.htaccess` (5 reglas) y sacado el `redirects` de
+      `astro.config.mjs`.
+- [x] `robots.txt` con la allowlist de crawlers de IA: 25 `User-agent`.
+
+**Verificado sobre dist:** `0` trabajos con noindex (antes 20); `/form-kickoff/`
+sigue con el suyo; **46** `<loc>` en el sitemap; `/formulario/` ya no genera pagina
+de meta-refresh.
+
+**Diff contra el sitemap de WordPress** (83 URLs vs 46): las 39 que faltan son
+**35 `/category/` + 2 `/author/` + `/formulario/` + `/reserva/`** — las cuatro
+familias cubiertas por los 301. Ninguna URL real se pierde.
+
+Commit: `d818beff`
+
+**Pendiente de verificar en staging**, no se puede local: que los `RewriteRule`
+disparen de verdad. Necesita Apache. `curl -I` sobre `/reserva/`,
+`/category/pais/argentina/` y `/author/octavio/` tiene que dar **301**.
 
 **Evidencia:** WordPress indexa 30 posts (`post-sitemap.xml`), Astro indexa 10. Las
 20 paginas de trabajo salen con `noindex, nofollow` mientras `/nuestro-trabajo/`
@@ -374,10 +392,19 @@ Caso aparte: el cuerpo de Q2 de externalizacion termina cortado en el original
 
 ## Progreso
 
-**T1, T2, T3 y T4 cerrados y verificados en navegador. T5 y T6 pendientes.**
+**Las 6 tareas cerradas y verificadas. La feature esta completa.**
 
-Rama `feat/paridad-sitio-original`, 5 commits, **sin pushear**. 19 archivos,
-+1038/-132. Arbol limpio.
+T1-T4 mergeados a `main` en el PR #7. T6 y T5 en la rama
+`feat/paridad-indexacion`, 2 commits (`d818beff`, `4ddbc208`).
+
+Se invirtio el orden de las dos ultimas: **T6 antes que T5**, porque T6 era la unica
+pendiente con consecuencia real (el portfolio invisible para Google) y T5 es
+cosmetica. Si el presupuesto se cortaba, se cortaba en lo que no se nota.
+
+Sin regresiones, verificado sobre `dist`: 47 paginas, 20 trabajos, 10 posts de blog;
+blog 60/40 justificado con destacada 1:1; trabajo 65/35 con ficha sticky y hero con
+`cover`; galerias con masonry de 4 columnas, `--row-h` del justified y el `<dialog>`
+en las 3 paginas; domo presente.
 
 | # | commit | que cerro |
 |---|---|---|
@@ -415,14 +442,15 @@ diferencias deliberadas anotadas en T3.
 
 ## Siguiente paso
 
-**T5** (links sociales reales, description del home, OG completo, y el error del
-formulario que le muestra `src/lib/formConfig.ts` al visitante) y **T6** (los 20
-trabajos con `noindex`, sitemap de 25 a 46 URLs, 301 de las 60 URLs viejas,
-robots.txt con la allowlist de crawlers de IA).
+La paridad esta terminada. Lo que queda **no es de esta feature**:
 
-Las dos son mas chicas y mas mecanicas que lo que ya se hizo. T6 es la unica que
-toca SEO, y es de riesgo cero para el sitio original.
-
-**Al retomar**, leer este archivo y correr el chequeo de esquema de `<h2>` antes de
-tocar nada: es el instrumento que encontro los dos huecos que el ratio de texto no
-veia.
+1. **Mergear `feat/paridad-indexacion`** y, una vez deployado, confirmar en staging
+   que los `RewriteRule` disparan: `curl -I` sobre `/reserva/`,
+   `/category/pais/argentina/` y `/author/octavio/` tiene que dar **301**. Es lo
+   unico de T6 que no se puede verificar sin Apache.
+2. **El switch del dominio**, con su runbook mas arriba. Ojo con la trampa anotada:
+   el staging sirve hoy un `robots.txt` que Hostinger inyecta con
+   `Googlebot: Disallow: /`. Hay que confirmar que desaparece al adjuntar el dominio
+   real, o Google desindexa todo — y ahora eso importa mas, porque el sitemap pasa a
+   declarar 46 URLs en vez de 25.
+3. **Access Key de Web3Forms**, que la crea Ignacio.
