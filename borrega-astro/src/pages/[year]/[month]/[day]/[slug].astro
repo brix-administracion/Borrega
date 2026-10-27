@@ -7,13 +7,12 @@ import { getAllPosts, getBlogCategoryId, isPublicBlogPost, featuredImageOf, tile
 import { cleanElementorHtml, plainTextFromHtml } from '../../../../lib/cleanContent';
 
 export async function getStaticPaths() {
-  // OJO: traemos TODOS los posts (no solo los del blog publico). La
-  // clienta usa varios posts de WordPress para compartir informacion por
-  // fuera de la web (mail, redes, etc.), sin que figuren en el listado de
-  // /borrega-blog/. Esos posts igual necesitan una URL real: si no los
-  // generamos aca, cualquier link que la clienta ya haya compartido deja
-  // de funcionar. Lo que SI cambia por categoria es: (a) si aparecen
-  // listados en /borrega-blog/ y (b) si son indexables por buscadores.
+  // Traemos TODOS los posts, no solo los del blog: los 30 de WordPress son
+  // publicos. 10 tienen la categoria `blogpost` y van al listado del blog; los
+  // otros 20 son los trabajos del portfolio y se listan en /nuestro-trabajo/.
+  // Lo unico que cambia segun la categoria es (a) en que listado aparecen y
+  // (b) con que plantilla se pintan. La indexabilidad NO: WordPress publica los
+  // 30 en su post-sitemap.xml y nosotros hacemos lo mismo.
   const [posts, blogCategoryId] = await Promise.all([getAllPosts(), getBlogCategoryId()]);
   return posts.map((post) => {
     const path = postPath(post); // /YYYY/MM/DD/slug/
@@ -30,10 +29,8 @@ const img = featuredImageOf(post);
 const content = cleanElementorHtml(post.content.rendered);
 const title = post.title.rendered;
 
-// La plantilla sale de la MISMA senal que el noindex: un post con la categoria
-// `blogpost` es del blog; el resto es un trabajo (o un post privado que la
-// clienta comparte por fuera, que en WordPress tambien usa la plantilla de
-// trabajo). Las URLs no cambian: getStaticPaths sigue generando los 30.
+// Un post con la categoria `blogpost` usa la plantilla de blog; el resto son
+// trabajos del portfolio y usan la de trabajo, igual que en WordPress.
 const template = isPublic ? 'blog' : 'work';
 
 // og:image la leen scrapers externos (WhatsApp, LinkedIn, Twitter, Slack) y no
@@ -65,7 +62,7 @@ if (img) {
 const excerpt = plainTextFromHtml(post.excerpt.rendered);
 ---
 
-<BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={ogImage} noindex={!isPublic}>
+<BaseLayout title={`${title} — Börrega Studio`} description={excerpt} ogImage={ogImage}>
   {template === 'blog' ? (
     <BlogPost post={post} content={content} isPublic={isPublic} />
   ) : (

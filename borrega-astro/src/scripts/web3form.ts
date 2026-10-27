@@ -57,7 +57,11 @@ export function initWeb3Form(formId: string, options: { downloadSummary?: boolea
     e.preventDefault();
 
     if (WEB3FORMS_ACCESS_KEY.startsWith('REEMPLAZAR')) {
-      setStatus('error', 'Este formulario todavia no tiene configurada la Access Key de Web3Forms. Ver src/lib/formConfig.ts.');
+      // El mensaje es para el visitante, no para quien programa: decirle "ver
+      // src/lib/formConfig.ts" a alguien que quiere mandar un CV le muestra
+      // rutas del repo y lo deja sin salida. La ruta sigue estando en el
+      // comentario de arriba, que es donde la busca quien mantiene esto.
+      setStatus('error', 'No pudimos enviar el formulario. Escribinos a info@borregastudio.com y lo resolvemos.');
       return;
     }
 

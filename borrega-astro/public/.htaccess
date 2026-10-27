@@ -1,3 +1,34 @@
+# Redirecciones 301 de las URLs que WordPress tenia indexadas y Astro no genera.
+# Van ANTES de todo lo demas para que no dependan del orden de evaluacion.
+#
+# Son ~60 URLs reales del sitemap viejo, cubiertas por patron en vez de una por
+# una: 59 archivos de taxonomia de Yoast (/category/... y /author/...) mas
+# /reserva/. Sin esto, el dia del switch de dominio todas dan 404.
+#
+# Por que aca y no en el `redirects` de astro.config.mjs: en modo `static` ese
+# mecanismo emite una pagina con <meta http-equiv="refresh">, que responde 200.
+# La URL vieja sigue viva y el buscador no traslada la señal.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # El archivo de la categoria del blog -> el listado del blog.
+  RewriteRule ^category/blogpost/?$ /borrega-blog/ [R=301,L]
+
+  # El resto de /category/ son las taxonomias de los proyectos (por servicio,
+  # por pais, por software): el equivalente mas cercano es el portfolio.
+  RewriteRule ^category/ /nuestro-trabajo/ [R=301,L]
+
+  # Los archivos de autor de Yoast no tienen equivalente: al home.
+  RewriteRule ^author/ / [R=301,L]
+
+  # La clienta renombro la pagina de reserva en WordPress; Astro sirve la
+  # nuestra en /reservar-consulta/.
+  RewriteRule ^reserva/?$ /reservar-consulta/ [R=301,L]
+
+  # URL vieja y duplicada: mismo formulario y mismo texto que /sumate/.
+  RewriteRule ^formulario/?$ /sumate/ [R=301,L]
+</IfModule>
+
 # Cache del sitio estatico (Astro) servido en Hostinger.
 # HTML: se revalida siempre -> los cambios tras cada deploy se ven al instante.
 # Assets con hash en el nombre (/_astro/, imagenes): inmutables -> cache larga.
